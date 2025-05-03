@@ -1,1 +1,1 @@
-# opensource_basic_project
+# TourAPI 4.0d을 이용한 여행지 추천 앱
