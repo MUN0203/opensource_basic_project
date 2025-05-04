@@ -6,6 +6,11 @@
 - 해당 지역의 날씨정보를 제공
 - 해당 지역의 특산품이나 관광정보를 제공
 
+## 사용 기술 스택
+- 프론트엔드 작성 언어: HTML, CSS, JavaScript
+- 백엔드 작성 언어: Python
+- 웹 프레임워크: Flask (백엔드 ,BSD-3-Clause license), Bootstrap (프론트엔드, MIT License)
+
 
 ## 개발 환경 설정 방법
 
