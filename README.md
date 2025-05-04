@@ -15,13 +15,12 @@ https://github.com/MUN0203/opensource_basic_project
 
 ### 가상환경 생성 및 활성화
 1. 가상환경 설정
-   python3 -m venv venv
+python3 -m venv venv
 
 2. 가상환경 활성화 / 비활성화
-   source venv/bin/activate (활성화)
-   deactivate (비활성화)
+source venv/bin/activate (활성화)
+deactivate (비활성화)
 
 4. 라이브러리 설치
-   pip install -r requirements.txt
+pip install -r requirements.txt
 
-----------
