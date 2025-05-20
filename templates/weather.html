@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>여행지 검색</title>
+  <!-- Flask를 위해 수정 (CSS 연결)-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="iphone-frame">
+    <div class="dynamic-island">
+      <div class="time" id="currentTime">12:00</div>
+      <div class="island"></div>
+      <div class="status-icons">
+       <img src="{{ url_for('static', filename='doc.png') }}" alt="status icons" class="status-img">
+      </div>
+    </div>
+
+    <div class="app-screen">
+      <h2>날씨 페이지</h2>
+      <p>api연동 -> 예보? </p>
+      <button class="app" onclick="navigate('index.html')">홈으로</button>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script>
+    function navigate(page) {
+      window.location.href = page;
+    }
+    function updateTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+</body>
+</html>
