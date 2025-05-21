@@ -18,6 +18,24 @@ def index():
 
     return render_template('index.html', title='해당 타이틀 미정', tour_api_key_loaded=key_loaded)
 
+# 여행지 검색 페이지
+@app.route('/search')
+def search():
+    # 여기에 여행지 검색 관련 로직 추가 가능
+    return render_template('search.html')
+
+# 여행지 추천 페이지
+@app.route('/recommend')
+def recommend():
+    # 여기에 여행지 추천 관련 로직 추가 가능
+    return render_template('recommend.html')
+
+# 날씨 확인 페이지
+@app.route('/weather')
+def weather():
+    # 여기에 날씨 확인 관련 로직 추가 가능
+    return render_template('weather.html')
+
 if __name__ == '__main__':
     # debug_mode = app.config.get('DEBUG', False) # 예: Config 클래스에 DEBUG = True/False 추가
     app.run(debug=True) # 개발 중에는 True 사용
