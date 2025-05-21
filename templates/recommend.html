@@ -20,7 +20,9 @@
     <div class="app-screen">
       <h2>여행지 추천 페이지</h2>
       <p>사용자 (각종테마? 분야?) 선택 -> 추천 페이지</p>
-      <button class="app" onclick="navigate('index.html')">홈으로</button>
+      <!-- Flask 연동 -->
+      <a href="{{ url_for('index') }}" class="app">홈으로</a>
+      <!-- <button class="app" onclick="navigate('index.html')">홈으로</button> -->
     </div>
 
     <div class="home-indicator"></div>

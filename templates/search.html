@@ -21,7 +21,9 @@
       <h2>여행지 검색 페이지</h2>
       <p>여행지를 검색해보세요!</p>
       <p>여행지정보? 숙소정보? 날씨? 특산품?</p>
-      <button class="app" onclick="navigate('index.html')">홈으로</button>
+      <!-- Flask 연동 -->
+      <a href="{{ url_for('index') }}" class="app">홈으로</a>
+      <!-- <button class="app" onclick="navigate('index.html')">홈으로</button> -->
     </div>
 
     <div class="home-indicator"></div>

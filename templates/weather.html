@@ -20,7 +20,9 @@
     <div class="app-screen">
       <h2>날씨 페이지</h2>
       <p>api연동 -> 예보? </p>
-      <button class="app" onclick="navigate('index.html')">홈으로</button>
+      <!-- Flask 연동 -->
+      <a href="{{ url_for('index') }}" class="app">홈으로</a>
+      <!-- <button class="app" onclick="navigate('index.html')">홈으로</button> -->
     </div>
 
     <div class="home-indicator"></div>
