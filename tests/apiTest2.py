@@ -7,6 +7,8 @@ import config
 from areaCode import areaCode
 from categoryCode1 import categoryCode1
 from areaBasedList1 import areaBasedList1
+from locationBasedList1 import locationBasedList1
+from searchKeyword1 import searchKeyword1
 
 
 def_params = {
@@ -20,6 +22,8 @@ def_params = {
 print("1. 지역 코드 조회")
 print("2. 서비스 분류 코드 조회")
 print("3. 지역 기반 관광 정보 조회")
+print("4. 위치 기반 관광 정보 조회")
+print("5. 키워드 검색 조회")
 
 select = int(input("번호 입력: "))
 
@@ -34,3 +38,11 @@ elif select == 2 :
 elif select == 3 :
     # 지역 기반 관광 정보 조회
     areaBasedList1(def_params)
+
+elif select == 4 :
+    # 위치 기반 관광 정보 조회
+    locationBasedList1(def_params)
+
+elif select == 5 :
+    # 키워드 검색 조회
+    searchKeyword1(def_params)
