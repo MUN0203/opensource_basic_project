@@ -92,6 +92,9 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: transform 0.2s ease;
+
+  text-decoration: none;   /* 모든 상태에서 밑줄 없음 */
+  color: black;          /* 모든 상태에서 글자색 검은색 (원하는 색으로 변경) */
 }
 
 .app:hover {
