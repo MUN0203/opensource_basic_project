@@ -4,19 +4,19 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 import config
 
-from areaCode import areaCode
-from categoryCode1 import categoryCode1
-from areaBasedList1 import areaBasedList1
-from locationBasedList1 import locationBasedList1
-from searchKeyword1 import searchKeyword1
-from searchFestival1 import searchFestival1
-from searchStay1 import searchStay1
-from detailCommmon1 import detailCommon1
-from detailIntro1 import detailIntro1
-from detailInfo1 import detailInfo11
-from detailImage1 import detailImage1
-from areaBasedSyncList1 import areaBasedSyncList1
-from detailPetTour1 import detailPetTour1
+from tests.areaCode import areaCode
+from tests.categoryCode1 import categoryCode1
+from tests.areaBasedList1 import areaBasedList1
+from tests.locationBasedList1 import locationBasedList1
+from tests.searchKeyword1 import searchKeyword1
+from tests.searchFestival1 import searchFestival1
+from tests.searchStay1 import searchStay1
+from tests.detailCommmon1 import detailCommon1
+from tests.detailIntro1 import detailIntro1
+from tests.detailInfo1 import detailInfo11
+from tests.detailImage1 import detailImage1
+from tests.areaBasedSyncList1 import areaBasedSyncList1
+from tests.detailPetTour1 import detailPetTour1
 
 
 def_params = {
