@@ -20,6 +20,22 @@
     <div class="app-screen">
       <h2>여행지 검색 페이지</h2>
       <p>여행지를 검색해보세요!</p>
+      <!-- 폼 입력, 입력하면 app.py keyword 변수에 저장 -->
+      <form method="post"><label for="keyword">검색어를 입력하세요</label>
+        <input type = "text" id="keyword" name = "keyword" required>
+        <button type="submit">검색</button>
+      </form>
+      <!-- 결과출력 -->
+      {% if items %}
+        <h3>검색 결과</h3>
+        <p>
+          <ul>
+            {% for item in items %}
+            <li>{{ item.title }}</li>
+            {% endfor %}
+          </ul>
+        </p>
+      {% endif %}
       <p>여행지정보? 숙소정보? 날씨? 특산품?</p>
       <!-- Flask 연동 -->
       <a href="{{ url_for('index') }}" class="app">홈으로</a>
