@@ -9,6 +9,14 @@ from categoryCode1 import categoryCode1
 from areaBasedList1 import areaBasedList1
 from locationBasedList1 import locationBasedList1
 from searchKeyword1 import searchKeyword1
+from searchFestival1 import searchFestival1
+from searchStay1 import searchStay1
+from detailCommmon1 import detailCommon1
+from detailIntro1 import detailIntro1
+from detailInfo1 import detailInfo11
+from detailImage1 import detailImage1
+from areaBasedSyncList1 import areaBasedSyncList1
+from detailPetTour1 import detailPetTour1
 
 
 def_params = {
@@ -24,6 +32,14 @@ print("2. 서비스 분류 코드 조회")
 print("3. 지역 기반 관광 정보 조회")
 print("4. 위치 기반 관광 정보 조회")
 print("5. 키워드 검색 조회")
+print("6. 행사 정보 조회")
+print("7. 숙박 정보 조회")
+print("8. 공통 정보 조회")
+print("9. 소개 정보 조회")
+print("10. 반복 정보 조회")
+print("11. 이미지 정보 조회")
+print("12. 국문관광정보 동기화 목록 조회")
+print("13. 국문관광정보 반려동물 여행 정보")
 
 select = int(input("번호 입력: "))
 
@@ -46,3 +62,35 @@ elif select == 4 :
 elif select == 5 :
     # 키워드 검색 조회
     searchKeyword1(def_params)
+
+elif select == 6 :
+    # 행사 정보 조회
+    searchFestival1(def_params)
+
+elif select == 7 :
+    # 숙박 정보 조회
+    searchStay1(def_params)
+
+elif select == 8 :
+    # 공통 정보 조회
+    detailCommon1(def_params)
+
+elif select == 9 :
+    # 소개 정보 조회
+    detailIntro1(def_params)
+
+elif select == 10 :
+    # 반복 정보 조회
+    detailInfo11(def_params)
+
+elif select == 11 :
+    # 반복 정보 조회
+    detailImage1(def_params)
+
+elif select == 12 :
+    # 국문관광정보 동기화 목록 조회
+    areaBasedSyncList1(def_params)
+
+elif select == 13 :
+    # 국문관광정보 반려동물 여행 정보
+    detailPetTour1(def_params)
