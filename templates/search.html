@@ -32,6 +32,23 @@
           <ul>
             {% for item in items %}
             <li>{{ item.title }}</li>
+            <!-- 주소 전화번호 이미지 출력-->
+              <ul>
+                <li>주소: {{ item.addr1 }}</li>
+                <li>전화번호: {{ item.tel }}</li>
+                <li> 
+                  {% if item.firstimage2 %}
+                     <img src="{{ item.firstimage2 }}" alt="{{ item.title }} 이미지" 
+                     class="search-result-image">
+                  {% else %}
+                    <div class="search-no-image">
+                      <p>이미지 없음</p>
+                    </div>
+                  {% endif %}
+                </li>
+                <li>날씨</li>
+                <li>카카오맵</li>
+              </ul>
             {% endfor %}
           </ul>
         </p>
