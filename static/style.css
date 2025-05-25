@@ -61,7 +61,7 @@ body {
 }
 
 .status-img {
-  height: 110px;         /* 원하는 크기로 조절 가능 */
+  height: 30px;         /* 원하는 크기로 조절 가능 */
   margin-right: 30;
   margin-top: 18px
 }
