@@ -57,6 +57,11 @@ def weather():
     # 여기에 날씨 확인 관련 로직 추가 가능
     return render_template('weather.html')
 
+@app.route('/detail')
+def detail():
+    # 여기에 날씨 확인 관련 로직 추가 가능
+    return render_template('detail.html')
+
 if __name__ == '__main__':
     # debug_mode = app.config.get('DEBUG', False) # 예: Config 클래스에 DEBUG = True/False 추가
     app.run(debug=True) # 개발 중에는 True 사용
