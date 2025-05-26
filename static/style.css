@@ -133,3 +133,21 @@ body {
   color: #777;
   font-size: 0.9em;
 }
+
+.banner-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.site-logo-black {
+  font-size: 4rem;
+  font-weight: bold;
+  text-align: center;
+  margin:  2rem 0 1rem 0;
+  color: #222;
+  font-family: 'Segoe UI', sans-serif;
+  text-shadow:
+    2px 2px 4px rgba(170, 221, 255, 0.7),    /* 연한 하늘색, 좀 투명하게 */
+    4px 4px 8px rgba(170, 221, 255, 0.4); 
+}

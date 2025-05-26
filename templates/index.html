@@ -10,15 +10,23 @@
 <body>
   
   <div class="iphone-frame">
+
     <!-- Dynamic Island Header -->
     <div class="dynamic-island">
-        <div class="time" id="currentTime">12:00</div>
-        <div class="island"></div>
-        <div class="status-icons">
+      <div class="time" id="currentTime">12:00</div>
+      <div class="island"></div>
+      <div class="status-icons">
         <img src="{{ url_for('static', filename='doc.png') }}" alt="status icons" class="status-img">
-  </div>
+      </div>
     </div>
 
+    <!-- 여행 이미지 추가 -->
+    <div class="banner-image">
+      <img src="{{ url_for('static', filename='banner.png') }}" alt="Trip Image">
+    </div>
+
+    <!-- 로고 텍스트 -->
+    <div class="site-logo-black">TripPick</div>
     
 
     <!-- App Home Screen -->
