@@ -18,12 +18,26 @@
     </div>
 
     <div class="app-screen">
-      <h2>여행지 검색 페이지</h2>
+      <!-- 상단바 (back 버튼 제거 또는 유지 가능) -->
+      <div class="search-header">
+        <!-- 필요하다면 백버튼 유지 -->
+      </div>
+
+      <!-- TripPick 로고: 홈으로 이동 -->
+      <a href="{{ url_for('index') }}" class="logo-text-center">
+        TripPick
+      </a>
+
+      <!-- <- 여행지 검색: 이전 페이지로 이동 -->
+      <a href="javascript:history.back()" class="page-title-left">
+        &lt;- 여행지 검색
+      </a>
+
       <p>여행지를 검색해보세요!</p>
       <!-- 폼 입력, 입력하면 app.py keyword 변수에 저장 -->
-      <form method="post"><label for="keyword">검색어를 입력하세요</label>
-        <input type = "text" id="keyword" name = "keyword" required>
-        <button type="submit">검색</button>
+      <form method="post">
+        <input type="text" id="keyword" name="keyword" placeholder="검색어를 입력하세요" required class="search-input">
+        <button type="submit" class="search-btn">검색</button>
       </form>
       <!-- 결과출력 -->
       {% if items %}
