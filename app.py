@@ -89,10 +89,10 @@ def recommend_theme(theme_name):
     return render_template('theme_result.html', theme=theme_name, items=items)
 
 # 날씨 확인 페이지
-@app.route('/weather')
-def weather():
+@app.route('/review')
+def review():
     # 여기에 날씨 확인 관련 로직 추가 가능
-    return render_template('weather.html')
+    return render_template('review.html')
 
 @app.route('/detail')
 def detail():
