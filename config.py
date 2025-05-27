@@ -16,6 +16,12 @@ class Config:
     # 한국관광공사 TourAPI 일반 인증키 (Decoding 된 값)
     __TOUR_API_KEY = os.environ.get('TOUR_API_KEY')
     
+    # 지역 특산물 API 키
+    __SPCPRD_API_KEY = os.environ.get('SPCPRD_API_KEY')
     @classmethod
     def getTOUR_API_KEY(self) :
-        return self.__TOUR_API_KEY
+        return self.__TOUR_API_KEY  
+    
+    @classmethod
+    def getSPCPRD_API_KEY(self) :
+        return self.__SPCPRD_API_KEY

@@ -17,6 +17,9 @@ from tests.detailInfo1 import detailInfo11
 from tests.detailImage1 import detailImage1
 from tests.areaBasedSyncList1 import areaBasedSyncList1
 from tests.detailPetTour1 import detailPetTour1
+from tests.spcprd import localSpcprd
+from tests.spcprd2 import localSpcprd2
+from tests.spcprd3 import localSpcprd3
 
 
 def_params = {
@@ -25,6 +28,11 @@ def_params = {
     "MOBILE_OS" : "ETC", # 예: "IOS", "AND", "WIN", "ETC" (기타)
     "MOBILE_APP" : "MyTravelApp", # 개발 중인 서비스명 또는 앱 이름
     "BASE_URL" : "http://apis.data.go.kr/B551011/KorService1"
+}
+
+def_params2 = {
+    "SERVICE_KEY" : config.Config.getSPCPRD_API_KEY(),
+    "BASE_URL" : "http://api.nongsaro.go.kr/service/localSpcprd"
 }
 
 print("1. 지역 코드 조회")
@@ -40,6 +48,10 @@ print("10. 반복 정보 조회")
 print("11. 이미지 정보 조회")
 print("12. 국문관광정보 동기화 목록 조회")
 print("13. 국문관광정보 반려동물 여행 정보")
+
+print("14. 지역 특산물 정보 / 시도 데이터 목록")
+print("15. 지역 특산물 정보 / 시군구 데이터 목록")
+print("16. 지역 특산물 정보")
 
 select = int(input("번호 입력: "))
 
@@ -94,3 +106,15 @@ elif select == 12 :
 elif select == 13 :
     # 국문관광정보 반려동물 여행 정보
     detailPetTour1(def_params)
+
+elif select == 14 :
+    # 지역 특산물 정보 / 시도 데이터 목록
+    localSpcprd(def_params2)
+
+elif select == 15 :
+    # 지역 특산물 정보 / 시군구 데이터 목록
+    localSpcprd2(def_params2)
+
+elif select == 16 :
+    # 지역 특산물 정보 / 지역 특산물 목록
+    localSpcprd3(def_params2)
