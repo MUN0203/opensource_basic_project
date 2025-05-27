@@ -17,7 +17,7 @@ items = []
 def index():
     # API 키 로딩 확인
     if tour_api_key and spcprd_api_key:
-        print(f"로드된 Tour API 키: {tour_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
+        print(f"로드된 Tour API 키: { tour_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
         print(f"로드된 지역 특산물 API 키: {spcprd_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
         key_loaded = True
     else:
@@ -86,7 +86,15 @@ def detail():
         "BASE_URL" : "http://api.nongsaro.go.kr/service/localSpcprd"
     } 
 
-    items2 = localSpcprd3(def_params2, item_addr1[1])
+    # 부산광역시, 대구광역시, 광주광역시, 인천광역시, 울산광역시, 세종특별자치시는 별도 로직 적용
+    if item_addr1[0] == "부산광역시" or "대구광역시" or "광주광역시" or "인천광역시" or "울산광역시" or "세종특별자치시" :
+        if item_addr1[1] != "기장군" or "달성군" or "강화군" or "웅진군" or "강화군" :
+            items2 = localSpcprd3(def_params2, item_addr1[1])
+        else :
+            items2 = localSpcprd3(def_params2, item_addr1[0])
+    else :
+        items2 = localSpcprd3(def_params2, item_addr1[1])
+        
     print(items2)
     
 
