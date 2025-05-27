@@ -30,12 +30,34 @@ def index():
 # 여행지 검색 페이지
 @app.route('/search', methods = ['GET', 'POST'])
 def search():
+    keyword = ''
+    items = []
+
     if tour_api_key :
         print(f"로드된 Tour API 키: {tour_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
         key_loaded = True
     else:
         print("Tour API 키를 로드하지 못했습니다. .env 파일을 확인하세요.")
         key_loaded = False
+        
+    def_params = {
+        "SERVICE_KEY": tour_api_key,
+        "MOBILE_OS": "ETC",
+        "MOBILE_APP": "MyTravelApp",
+        "BASE_URL": "http://apis.data.go.kr/B551011/KorService1"
+    }
+
+    if request.method == 'POST':
+        keyword = request.form.get('keyword', '').strip()
+        items = searchKeyword1(def_params, keyword)
+
+    return render_template(
+        'search.html',
+        title='여행지 검색',
+        items=items,
+        keyword=keyword,
+        tour_api_key_loaded=key_loaded
+    )   
 
     # Tour API
     def_params = {

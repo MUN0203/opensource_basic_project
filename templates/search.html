@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>여행지 검색</title>
-  <!-- Flask를 위해 수정 (CSS 연결)-->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -18,72 +17,56 @@
     </div>
 
     <div class="app-screen">
-      <!-- 상단바 (back 버튼 제거 또는 유지 가능) -->
-      <div class="search-header">
-        <!-- 필요하다면 백버튼 유지 -->
-      </div>
+      <a href="{{ url_for('index') }}" class="logo-text-center">TripPick</a>
 
-      <!-- TripPick 로고: 홈으로 이동 -->
-      <a href="{{ url_for('index') }}" class="logo-text-center">
-        TripPick
-      </a>
-
-      <!-- <- 여행지 검색: 아이콘만 클릭 시 이전 페이지 이동 -->
       <div class="back-section">
-        <img src="{{ url_for('static', filename='back-arrow.png') }}"
-             alt="뒤로가기"
-             class="back-icon"
-             onclick="history.back()" />
+        <img src="{{ url_for('static', filename='back-arrow.png') }}" alt="뒤로가기" class="back-icon" onclick="history.back()" />
         <span class="page-title-left">여행지 검색</span>
       </div>
 
       <p>여행지를 검색해보세요!</p>
-      <!-- 폼 입력, 입력하면 app.py keyword 변수에 저장 -->
-      <form method="post">
+
+      <form method="post" class="search-form">
         <input type="text" id="keyword" name="keyword" placeholder="검색어를 입력하세요" required class="search-input">
         <button type="submit" class="search-btn">검색</button>
       </form>
-      <!-- 결과출력 -->
+
       {% if items %}
-        <h3>검색 결과</h3>
-        <p>
-          <ul>
-            {% for item in items %}
-            <li><a href="{{ url_for('detail', item_addr1=item.addr1) }}">{{ item.title }}</a></li>
-            <!-- 주소 전화번호 이미지 출력-->
-              <ul>
-                <li>주소: {{ item.addr1 }}</li>
-                <li>전화번호: {{ item.tel }}</li>
-                <li> 
-                  {% if item.firstimage2 %}
-                     <img src="{{ item.firstimage2 }}" alt="{{ item.title }} 이미지" 
-                     class="search-result-image">
-                  {% else %}
-                    <div class="search-no-image">
-                      <p>이미지 없음</p>
-                    </div>
-                  {% endif %}
-                </li>
-                <li>날씨</li>
-                <li>카카오맵</li>
-              </ul>
-            {% endfor %}
-          </ul>
-        </p>
+        <h3 class="search-result-title">
+          {{ keyword if keyword else '' }} 여행지 검색 결과
+        </h3>
+        <div class="recommend-results">
+          {% for item in items %}
+            <div class="place-card">
+              {% if item.firstimage2 %}
+                <img src="{{ item.firstimage2 }}" alt="{{ item.title }}" class="place-image">
+              {% else %}
+                <div class="place-image-placeholder">이미지 없음</div>
+              {% endif %}
+              <div class="place-info">
+                <h3 class="place-title">
+                  <a href="{{ url_for('detail', item_addr1=item.addr1) }}" class="place-link">
+                    {{ item.title }}
+                  </a>
+                </h3>
+                <p class="place-address">📍 {{ item.addr1 or '주소 정보 없음' }}</p>
+                <p class="place-phone">☎️ {{ item.tel or '전화번호 정보 없음' }}</p>
+                <p class="placeholder">🌦 날씨 정보 (예정)</p>
+                <p class="placeholder">🗺️ 카카오맵 위치 (예정)</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
-      <p>여행지정보? 숙소정보? 날씨? 특산품?</p>
-      <!-- Flask 연동 -->
+
+      <p class="footer-info">여행지정보? 숙소정보? 날씨? 특산품?</p>
       <a href="{{ url_for('index') }}" class="app">홈으로</a>
-      <!-- <button class="app" onclick="navigate('index.html')">홈으로</button> -->
     </div>
 
     <div class="home-indicator"></div>
   </div>
 
   <script>
-    function navigate(page) {
-      window.location.href = page;
-    }
     function updateTime() {
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, '0');
