@@ -107,7 +107,7 @@ def detail():
     # print(items["addr1"])
     # 특산물 API
     item_addr1 = item_addr1.split()
-    print(item_addr1[1])
+    # print(item_addr1[1])
 
 
     def_params2 = {
@@ -115,13 +115,19 @@ def detail():
         "BASE_URL" : "http://api.nongsaro.go.kr/service/localSpcprd"
     } 
 
+    print(item_addr1)
     # 부산광역시, 대구광역시, 광주광역시, 인천광역시, 울산광역시, 세종특별자치시는 별도 로직 적용
-    if item_addr1[0] == "부산광역시" or "대구광역시" or "광주광역시" or "인천광역시" or "울산광역시" or "세종특별자치시" :
-        if item_addr1[1] == "기장군" or "달성군" or "강화군" or "웅진군" or "강화군" :
+    if item_addr1[0] == "부산광역시" or item_addr1[0] == "대구광역시" or item_addr1[0] == "광주광역시" or item_addr1[0] == "인천광역시" or item_addr1[0] == "울산광역시" or item_addr1[0] == "세종특별자치시" :
+        print(item_addr1[0])
+        if item_addr1[1] == "기장군" or item_addr1[1] == "달성군" or item_addr1[1] == "강화군" or item_addr1[1] == "옹진군" :
+            print(item_addr1[1])
             items2 = localSpcprd3(def_params2, item_addr1[1])
         else :
             print(item_addr1[0])
-            items2 = localSpcprd3(def_params2, item_addr1[0])
+            items1 = localSpcprd3(def_params2, item_addr1[0])
+            excluded_keywords = ['달성군', '기장군', '강화군', '옹진군']
+            items2 = [item for item in items1 if not any(keyword in item.get('areaNm', '') for keyword in excluded_keywords)]
+            print(items2)
     else :
         items2 = localSpcprd3(def_params2, item_addr1[1])
         
