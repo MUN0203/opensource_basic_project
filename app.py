@@ -51,6 +51,20 @@ def recommend():
     # 여기에 여행지 추천 관련 로직 추가 가능
     return render_template('recommend.html')
 
+# 테마별 추천 페이지
+@app.route('/recommend/<theme_name>')
+def recommend_theme(theme_name):
+    # 실제 서비스 분류 코드 또는 필터를 활용한 추천 로직 구현 가능
+    # 예: 힐링 → spa, 산, 자연 등 / 액티비티 → 레저, 체험 등
+
+    # 일단 더미 데이터를 예시로 보여주기
+    dummy_items = [
+        {"title": f"{theme_name.capitalize()} 명소 1", "addr1": "서울시 강남구", "tel": "010-1234-5678", "image": None},
+        {"title": f"{theme_name.capitalize()} 명소 2", "addr1": "부산 해운대구", "tel": "010-9876-5432", "image": None},
+    ]
+
+    return render_template('theme_result.html', theme=theme_name, items=dummy_items)
+
 # 날씨 확인 페이지
 @app.route('/weather')
 def weather():

@@ -170,12 +170,24 @@ body {
 .page-title-left {
   font-size: 1.5rem;
   font-weight: bold;
-  margin: 0 0 1rem 0;
-  padding-left: 0; 
   color: #333;
-  text-decoration: none; /* 밑줄 제거 */
+  user-select: none;
+  margin: 0;
+  padding: 0;
+}
+
+.back-section {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 430px;
+  padding-left: 1.5rem;
+  margin-top: 1rem;
+}
+
+.back-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 0.5rem;
   cursor: pointer;
-  display: block;
-  position: relative;
-  left: -7rem;
 }

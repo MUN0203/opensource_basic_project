@@ -2,9 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>여행지 검색</title>
-  <!-- Flask를 위해 수정 (CSS 연결)-->
+  <title>{{ theme|capitalize }} 테마 추천</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -18,33 +16,38 @@
     </div>
 
     <div class="app-screen">
-      <!-- TripPick 로고 -->
       <a href="{{ url_for('index') }}" class="logo-text-center">TripPick</a>
 
-      <!-- 뒤로가기 아이콘 (이미지 클릭 시만 history.back()) -->
+      <!-- 뒤로가기 이미지 -->
       <div class="back-section">
         <img src="{{ url_for('static', filename='back-arrow.png') }}" class="back-icon" onclick="history.back()" alt="back">
-        <span class="page-title-left">여행지 추천</span>
+        <span class="page-title-left">{{ theme|capitalize }} 추천</span>
       </div>
 
-      <!-- 테마 선택 -->
-      <p style="margin-top: 1rem;">원하는 테마를 선택하세요</p>
-      <a href="{{ url_for('recommend_theme', theme_name='힐링') }}" class="app">🌿 힐링</a>
-      <a href="{{ url_for('recommend_theme', theme_name='액티비티') }}" class="app">🧗 액티비티</a>
-      <a href="{{ url_for('recommend_theme', theme_name='사진 명소') }}" class="app">📷 사진 명소</a>
-      <a href="{{ url_for('recommend_theme', theme_name='먹거리') }}" class="app">🍽️ 먹거리</a>
+      <p>테마 "{{ theme|capitalize }}"에 맞는 추천 여행지입니다.</p>
 
-      <!-- 홈으로 -->
-      <a href="{{ url_for('index') }}" class="app">홈으로</a>
+      <ul>
+        {% for item in items %}
+        <li>
+          <strong>{{ item.title }}</strong><br/>
+          주소: {{ item.addr1 }}<br/>
+          전화번호: {{ item.tel }}<br/>
+          {% if item.image %}
+            <img src="{{ item.image }}" alt="이미지" class="search-result-image">
+          {% else %}
+            <div class="search-no-image"><p>이미지 없음</p></div>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+
+      <a href="{{ url_for('recommend') }}" class="app">추천 테마 선택으로</a>
     </div>
 
     <div class="home-indicator"></div>
   </div>
 
   <script>
-    function navigate(page) {
-      window.location.href = page;
-    }
     function updateTime() {
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, '0');
