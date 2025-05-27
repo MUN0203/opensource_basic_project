@@ -117,9 +117,10 @@ def detail():
 
     # 부산광역시, 대구광역시, 광주광역시, 인천광역시, 울산광역시, 세종특별자치시는 별도 로직 적용
     if item_addr1[0] == "부산광역시" or "대구광역시" or "광주광역시" or "인천광역시" or "울산광역시" or "세종특별자치시" :
-        if item_addr1[1] != "기장군" or "달성군" or "강화군" or "웅진군" or "강화군" :
+        if item_addr1[1] == "기장군" or "달성군" or "강화군" or "웅진군" or "강화군" :
             items2 = localSpcprd3(def_params2, item_addr1[1])
         else :
+            print(item_addr1[0])
             items2 = localSpcprd3(def_params2, item_addr1[0])
     else :
         items2 = localSpcprd3(def_params2, item_addr1[1])
