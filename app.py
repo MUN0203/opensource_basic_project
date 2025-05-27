@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import config
 from searchKeyword1 import searchKeyword1
+from searchTheme import searchTheme
 
 app = Flask(__name__)
 
@@ -54,16 +55,30 @@ def recommend():
 # 테마별 추천 페이지
 @app.route('/recommend/<theme_name>')
 def recommend_theme(theme_name):
-    # 실제 서비스 분류 코드 또는 필터를 활용한 추천 로직 구현 가능
-    # 예: 힐링 → spa, 산, 자연 등 / 액티비티 → 레저, 체험 등
+    def_params = {
+        "SERVICE_KEY": config.Config.getTOUR_API_KEY(),
+        "MOBILE_OS": "ETC",
+        "MOBILE_APP": "MyTravelApp",
+        "BASE_URL": "http://apis.data.go.kr/B551011/KorService1"
+    }
+    
+    # 테마별 카테고리 매핑
+    theme_category_map = {
+        "healing":  {"cat1": "A01", "cat2": ["A0101", "A0103", "A0208"], "contentTypeId": "12"},  # 자연/관광지
+        "activity": {"cat1": "A03", "cat2": ["A0301", "A0303", "A0305"], "contentTypeId": "28"},  # 체험
+        "photo":    {"cat1": "A02", "cat2": ["A0201", "A0202", "A0207"], "contentTypeId": "12"},  # 관광지
+        "food":     {"cat1": "A05", "cat2": ["A0502", "A0503", "A0505"], "contentTypeId": "39"}   # 음식
+    }
 
-    # 일단 더미 데이터를 예시로 보여주기
-    dummy_items = [
-        {"title": f"{theme_name.capitalize()} 명소 1", "addr1": "서울시 강남구", "tel": "010-1234-5678", "image": None},
-        {"title": f"{theme_name.capitalize()} 명소 2", "addr1": "부산 해운대구", "tel": "010-9876-5432", "image": None},
-    ]
-
-    return render_template('theme_result.html', theme=theme_name, items=dummy_items)
+    if theme_name in theme_category_map:
+       theme_config = theme_category_map[theme_name]
+       cat1 = theme_config["cat1"]
+       cat2_list = theme_config["cat2"]
+       contentTypeId = theme_config["contentTypeId"]
+       items = searchTheme(def_params, cat1, cat2_list, contentTypeId) 
+    else:
+       items = []
+    return render_template('theme_result.html', theme=theme_name, items=items)
 
 # 날씨 확인 페이지
 @app.route('/weather')
