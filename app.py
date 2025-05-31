@@ -3,6 +3,9 @@ import config
 from searchKeyword1 import searchKeyword1
 from searchTheme import searchTheme
 from spcprd3 import localSpcprd3
+from detailCommon1 import detailCommon1
+
+from keywordExtraction import keywordExtraction
 
 app = Flask(__name__)
 
@@ -59,23 +62,6 @@ def search():
         tour_api_key_loaded=key_loaded
     )   
 
-    # Tour API
-    def_params = {
-        "SERVICE_KEY" : tour_api_key,
-        # 서비스 호출 시 필수 파라미터
-        "MOBILE_OS" : "ETC", # 예: "IOS", "AND", "WIN", "ETC" (기타)
-        "MOBILE_APP" : "MyTravelApp", # 개발 중인 서비스명 또는 앱 이름
-        "BASE_URL" : "http://apis.data.go.kr/B551011/KorService1"
-    }   
-    
-    # 폼에서 입력하면 입력한 키워드로 Tour API, 특산물 API로부터 데이터 가져오기
-    items = []
-    if request.method == 'POST' :
-        keyword = request.form.get('keyword', '').strip()
-        items = searchKeyword1(def_params, keyword)
-    # print(items)
-    return render_template('search.html', title='해당 타이틀 미정', items = items, tour_api_key_loaded=key_loaded)
-
 # 여행지 추천 페이지
 @app.route('/recommend')
 def recommend():
@@ -110,15 +96,37 @@ def recommend_theme(theme_name):
        items = []
     return render_template('theme_result.html', theme=theme_name, items=items)
 
-# 날씨 확인 페이지
+# 리뷰 확인 페이지
 @app.route('/review')
 def review():
     # 여기에 날씨 확인 관련 로직 추가 가능
     return render_template('review.html')
 
+# 상세페이지
 @app.route('/detail')
 def detail():
+    def_params = {
+        "SERVICE_KEY": config.Config.getTOUR_API_KEY(),
+        "MOBILE_OS": "ETC",
+        "MOBILE_APP": "MyTravelApp",
+        "BASE_URL": "http://apis.data.go.kr/B551011/KorService1"
+    }
+
+    # search.html로부터 정보 얻어오기
     item_addr1 = request.args.get('item_addr1')
+    contentid = request.args.get('contentid')
+    image = request.args.get('image')
+    title = request.args.get('title')
+    tel = request.args.get('tel')
+
+    info = {
+        "item_addr1" : item_addr1,
+        "contentid" : contentid,
+        "image" : image,
+        "title" : title,
+        "tel" : tel
+    }
+
     if spcprd_api_key :
         print(f"로드된 Tour API 키: {spcprd_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
         key_loaded2 = True
@@ -126,18 +134,22 @@ def detail():
         print("특산물 API 키를 로드하지 못했습니다. .env 파일을 확인하세요.")
         key_loaded2 = False
 
+    if item_addr1 == "" :
+        item_addr1 = "주소 없음"
     # print(items["addr1"])
     # 특산물 API
-    item_addr1 = item_addr1.split()
+    item_addr1 = item_addr1.split() 
     # print(item_addr1[1])
 
 
+    print(item_addr1)
     def_params2 = {
         "apiKey" : spcprd_api_key,
         "BASE_URL" : "http://api.nongsaro.go.kr/service/localSpcprd"
     } 
 
     print(item_addr1)
+
     # 부산광역시, 대구광역시, 광주광역시, 인천광역시, 울산광역시, 세종특별자치시는 별도 로직 적용
     if item_addr1[0] == "부산광역시" or item_addr1[0] == "대구광역시" or item_addr1[0] == "광주광역시" or item_addr1[0] == "인천광역시" or item_addr1[0] == "울산광역시" or item_addr1[0] == "세종특별자치시" :
         print(item_addr1[0])
@@ -154,9 +166,25 @@ def detail():
         items2 = localSpcprd3(def_params2, item_addr1[1])
         
     print(items2)
-    
 
-    return render_template('detail.html', items2 = items2)
+
+    # 상세 정보 불러오기
+    detailInfo = detailCommon1(def_params, info["contentid"])
+    print(f'테스트{detailInfo}')
+
+
+    # 키워드 추출
+    if detailInfo['item'][0]['overview'] == "-" or detailInfo['item'][0]['overview'] == "":
+        keywordResult = ""
+    else :
+        print(f'개요 테스트: {detailInfo['item'][0]['overview']}')
+
+        # 키워드 추출
+        keywordResult = keywordExtraction(detailInfo['item'][0]['overview'])
+        print()
+        print(f'키워드 결과: {keywordResult}')
+    
+    return render_template('detail.html', items2 = items2, info = info, keywords = keywordResult)
 
 if __name__ == '__main__':
     # debug_mode = app.config.get('DEBUG', False) # 예: Config 클래스에 DEBUG = True/False 추가
