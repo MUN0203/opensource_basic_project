@@ -112,7 +112,20 @@ def recommend_theme(theme_name):
        items = searchTheme(def_params, cat1, cat2_list, contentTypeId) 
     else:
        items = []
-    return render_template('theme_result.html', theme=theme_name, items=items)
+
+    # 날씨 불러오기
+    coords = [
+        {"mapx": None, "mapy": None}
+        if not item["addr1"]
+        else {"mapx": float(item["mapx"]), "mapy": float(item["mapy"])}
+        for item in items
+    ]
+        
+    lats = [c["mapy"] for c in coords]
+    lons = [c["mapx"] for c in coords]
+    results = get_kma_weather_multi(lats, lons)
+
+    return render_template('theme_result.html', theme=theme_name, items=items, weatherItems = results)
 
 # 리뷰 확인 페이지
 @app.route('/review')
