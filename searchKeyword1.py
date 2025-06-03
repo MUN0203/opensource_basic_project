@@ -48,6 +48,20 @@ def searchKeyword1(def_params, keyword) :
 
     items = []
     # 결과값을 가져온다.
-    if 'response' in data and 'body' in data['response'] and 'items' in data['response']['body']:
-        items = data['response']['body']['items'].get('item', [])
+    items_raw = data.get('response', {}) \
+                    .get('body', {}) \
+                    .get('items', None)
+
+    if isinstance(items_raw, str):
+        try:
+            # 문자열이 JSON 형태일 경우, 파싱해서 dict로 변환
+            items_section = json.loads(items_raw)
+        except json.JSONDecodeError:
+            # 파싱에 실패하면 빈 딕셔너리로 처리
+            items_section = {}
+    else:
+        items_section = items_raw or {}
+
+    # 이제 items_section는 dict이거나 빈 dict
+    items = items_section.get('item', [])
     return items
