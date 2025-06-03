@@ -7,6 +7,8 @@ from detailCommon1 import detailCommon1
 
 from keywordExtraction import keywordExtraction
 
+from weather import get_kma_weather_multi
+
 app = Flask(__name__)
 
 # Tour API 키 import
@@ -35,6 +37,7 @@ def index():
 def search():
     keyword = ''
     items = []
+    results = []
 
     if tour_api_key :
         print(f"로드된 Tour API 키: {tour_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
@@ -51,13 +54,28 @@ def search():
     }
 
     if request.method == 'POST':
+        # 키워드 검색하기
         keyword = request.form.get('keyword', '').strip()
         items = searchKeyword1(def_params, keyword)
+        print(f"테스트{items}")
+        # 날씨 불러오기
+        coords = [
+            {"mapx": None, "mapy": None}
+            if not item["addr1"]
+            else {"mapx": float(item["mapx"]), "mapy": float(item["mapy"])}
+            for item in items
+        ]
+        
+        lats = [c["mapy"] for c in coords]
+        lons = [c["mapx"] for c in coords]
+        results = get_kma_weather_multi(lats, lons)
+        print(results)
 
     return render_template(
         'search.html',
         title='여행지 검색',
         items=items,
+        weatherItems = results,
         keyword=keyword,
         tour_api_key_loaded=key_loaded
     )   
