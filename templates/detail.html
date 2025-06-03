@@ -18,7 +18,13 @@
     </div>
 
     <div class="app-screen">
-      <h2>상세 페이지</h2>
+      <a href="{{ url_for('index') }}" class="logo-text-center">TripPick</a>
+
+      <div class="back-section">
+        <img src="{{ url_for('static', filename='back-arrow.png') }}" alt="뒤로가기" class="back-icon" onclick="history.back()" />
+        <span class="page-title-left">상세 페이지</span>
+      </div>
+      <!-- <h2>상세 페이지</h2> -->
       <!--사진, 제목, 전화번호, 주소(카카오맵), 현재날씨와 예보(meteo-api), 특산물, 숙박 정보-->
 
       <!-- 상세정보 출력 (임시로 디자인 X)-->
@@ -41,7 +47,7 @@
         <p>
           <ul>
             {% for tag in keywords[:3] %}
-              <i>#{{ tag }}</li>
+              <li>#{{ tag }}</li>
             {% endfor %}
           </ul>
         </p>
@@ -58,7 +64,6 @@
         </p>
       {% endif %}
 
-      <button type="button" onclick="history.back();">뒤로가기</button>
       <!-- Flask 연동 -->
       <a href="{{ url_for('index') }}" class="app">홈으로</a>
       <!-- <button class="app" onclick="navigate('index.html')">홈으로</button> -->
