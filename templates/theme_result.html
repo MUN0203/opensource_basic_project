@@ -35,7 +35,15 @@
               <div class="place-image-placeholder">이미지 없음</div>
             {% endif %}
             <div class="place-info">
-              <h3 class="place-title">{{ item.title }}</h3>
+              <h3 class="place-title">
+                <a href="{{ url_for('detail', 
+                  item_addr1=item.addr1, 
+                  contentid = item.contentid, 
+                  image = item.firstimage,
+                  title = item.title,
+                  tel = item.tel) }}" class="place-link">
+                  {{ item.title }}
+                </h3>
               <p class="place-address">📍 {{ item.addr1 or '주소 정보 없음' }}</p>
             </div>
          </div>
