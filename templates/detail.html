@@ -19,8 +19,35 @@
 
     <div class="app-screen">
       <h2>상세 페이지</h2>
-      <p>사진, 제목, 전화번호, 주소(카카오맵), 현재날씨와 예보(meteo-api), 특산물, 휴무일, 개장시간, 주차시설, 상세 소개, 숙박 정보</p>
-      <!--  반려동물, 혼잡도 정보(별도의 api) -->
+      <!--사진, 제목, 전화번호, 주소(카카오맵), 현재날씨와 예보(meteo-api), 특산물, 숙박 정보-->
+
+      <!-- 상세정보 출력 (임시로 디자인 X)-->
+      {% if info %}
+        <h3>{{ info.title }}</h3>
+        {% if info.item_addr1 %}
+          <p>📍 {{ info.item_addr1 }}</p>
+        {% endif %}
+        {% if info.tel %}
+          <p>☎️ {{ info.tel }}</p>
+        {% endif %}
+        {% if info.image %}
+          <p><img src="{{ info.image }}" alt="{{ info.title }}" class="place-image"></p>
+        {% else %}
+          <div class="place-image-placeholder">이미지 없음</div>
+        {% endif %}
+      {% endif %}
+      <p>태그</p>
+      {% if keywords %}
+        <p>
+          <ul>
+            {% for tag in keywords[:3] %}
+              <i>#{{ tag }}</li>
+            {% endfor %}
+          </ul>
+        </p>
+      {% endif %}
+
+      <p>이 지역의 특산물 목록</p>
       {% if items2 %}
         <p>
           <ul>
@@ -30,6 +57,7 @@
           </ul>
         </p>
       {% endif %}
+
       <button type="button" onclick="history.back();">뒤로가기</button>
       <!-- Flask 연동 -->
       <a href="{{ url_for('index') }}" class="app">홈으로</a>
