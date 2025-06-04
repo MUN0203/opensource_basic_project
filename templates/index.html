@@ -8,7 +8,13 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <script>
+        alert("{{ messages[-1] }}");
+      </script>
+    {% endif %}
+  {% endwith %}
   <div class="iphone-frame">
 
     <!-- Dynamic Island Header -->
@@ -18,6 +24,15 @@
       <div class="status-icons">
         <img src="{{ url_for('static', filename='doc.png') }}" alt="status icons" class="status-img">
       </div>
+    </div>
+
+    <div class="login-logout">
+      {% if user %}
+        <a href="{{ url_for('dashboard') }}" class="app">{{ user.username }}</a>
+        <a href="{{ url_for('logout') }}" class="app">로그아웃</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="app">로그인</a>
+      {% endif %}
     </div>
 
     <!-- 여행 이미지 추가 -->
