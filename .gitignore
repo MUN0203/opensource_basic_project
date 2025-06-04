@@ -173,3 +173,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+
+# Flask-Session 데이터 폴더 (세션 파일)
+flask_session/
+
+# DB 파일
+flask.db
+*.db
