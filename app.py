@@ -1,5 +1,14 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
+
+# 데이터베이스 관련
+from flask_tinydb import TinyDB     
+from tinydb import Query            
+from flask_bcrypt import Bcrypt     # 비밀번호 해싱을 위해 사용
+from flask_session import Session   # 서버 측 세션 관리
+
+# API 키
 import config
+
 from searchKeyword1 import searchKeyword1
 from searchTheme import searchTheme
 from spcprd3 import localSpcprd3
@@ -10,6 +19,24 @@ from keywordExtraction import keywordExtraction
 from weather import get_kma_weather_multi
 
 app = Flask(__name__)
+
+# Flask-Session 설정
+app.config["SESSION_PERMANENT"] = False # 브라우저 종료 시 세션 만료
+app.config["SESSION_TYPE"] = "filesystem" # 세션 데이터를 파일 시스템에 저장
+app.secret_key = 'testSecretkey'
+
+Session(app)
+bcrypt = Bcrypt(app)
+
+
+# flask-tinydb 초기화
+# 기본적으로 인스턴스 폴더에 'database.json' 파일을 생성/사용
+db = TinyDB(app).get_db()
+
+# 테이블 정의
+usersTable = db.table("users")
+reviewsTable = db.table("reviews")
+favoritesTable = db.table("favorites") # 즐겨찾기
 
 # Tour API 키 import
 tour_api_key = config.Config.getTOUR_API_KEY()
@@ -30,7 +57,93 @@ def index():
         print("Tour API 키를 로드하지 못했습니다. .env 파일을 확인하세요.")
         key_loaded = False
 
-    return render_template('index.html', title='해당 타이틀 미정', tour_api_key_loaded=key_loaded)
+    user = None
+    if session.get('user_id'):
+        user = usersTable.get(doc_id=session['user_id'])
+
+    return render_template('index.html', title='해당 타이틀 미정', tour_api_key_loaded=key_loaded, user=user)
+
+# 회원가입 페이지
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # 1) 폼 데이터 받아오기
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+
+        # 2) 입력값 유효성 검사
+        if not username or not password:
+            flash('아이디와 비밀번호를 모두 입력해주세요.')
+            return redirect(url_for('register'))
+
+        # 3) 이미 가입된 아이디인지 확인
+        UserQuery = Query()
+        existing_user = usersTable.get(UserQuery.username == username)
+        if existing_user:
+            flash('이미 사용 중인 아이디입니다.')
+            return redirect(url_for('register'))
+
+        # 4) 비밀번호 해싱 후 저장
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        usersTable.insert({
+            'username': username,
+            'hashed_password': hashed_password
+        })
+
+        flash('회원가입이 완료되었습니다. 로그인해주세요.')
+        return redirect(url_for('login'))
+
+    # GET 요청일 때는 가입 폼 렌더링
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+
+        # 1) 입력값 확인
+        if not username or not password:
+            flash('아이디와 비밀번호를 모두 입력해주세요.')
+            return redirect(url_for('login'))
+
+        # 2) DB에서 사용자 조회
+        UserQuery = Query()
+        user_doc = usersTable.get(UserQuery.username == username)
+        if not user_doc:
+            flash('존재하지 않는 아이디입니다.')
+            return redirect(url_for('login'))
+
+        # 3) 비밀번호 비교 (bcrypt)
+        if not bcrypt.check_password_hash(user_doc['hashed_password'], password):
+            flash('비밀번호가 틀렸습니다.')
+            return redirect(url_for('login'))
+
+        # 4) 로그인 성공 → 세션에 사용자 정보 저장
+        session['user_id'] = user_doc.doc_id
+        # flash('로그인 성공!')
+        return redirect(url_for('index'))
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+
+# 대시보드(로그인 후 접근) 페이지
+@app.route('/dashboard')
+def dashboard():
+    # 보호된 페이지: 로그인된 사용자만 접근 가능
+    if 'user_id' not in session:
+        flash('로그인이 필요합니다.')
+        return redirect(url_for('login'))
+
+    # 현재 로그인한 사용자의 정보를 가져옴
+    user = usersTable.get(doc_id=session['user_id'])
+    return render_template('dashboard.html', user=user)
+
 
 # 여행지 검색 페이지
 @app.route('/search', methods = ['GET', 'POST'])
