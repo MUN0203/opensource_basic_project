@@ -1,0 +1,71 @@
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <script>
+            alert("{{messages [-1]}}")
+        </script>
+    {% endif %}
+{% endwith %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPhone Styled Webpage</title>
+  <!-- Flask를 위해 수정 (CSS)-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  
+  <div class="iphone-frame">
+
+    <!-- Dynamic Island Header -->
+    <div class="dynamic-island">
+      <div class="time" id="currentTime">12:00</div>
+      <div class="island"></div>
+      <div class="status-icons">
+        <img src="{{ url_for('static', filename='doc.png') }}" alt="status icons" class="status-img">
+      </div>
+    </div>
+
+    <!-- 여행 이미지 추가 -->
+    <div class="banner-image">
+      <img src="{{ url_for('static', filename='banner.png') }}" alt="Trip Image">
+    </div>
+
+    <!-- 로고 텍스트 -->
+    <div class="site-logo-black">TripPick</div>
+    
+
+    <!-- App Home Screen -->
+    <div class="app-screen">
+      <form method="post" class="search-form">
+        <label for="username">아이디:</label><br>
+            <input type="text" id="username" name="username" required><br><br>
+            <label for="password">비밀번호:</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+            <button type="submit">로그인</button>
+        </form>
+    </div>
+
+    <!-- iPhone Home Indicator -->
+    <div class="home-indicator"></div>
+  </div>
+
+  <script>
+    function navigate(page) {
+      window.location.href = page;
+    }
+
+    function updateTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+</body>
+</html>
