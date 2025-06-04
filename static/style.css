@@ -308,3 +308,23 @@ body {
   color: #777;
   margin: 0.2rem 0;
 }
+
+.map-button {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 0.90em;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 6px;
+  display: inline-block;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.map-button:hover {
+  color: #000; /* 마우스 올렸을 때 진한 검정 */
+  text-decoration: none;
+  
+}
