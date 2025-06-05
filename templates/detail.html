@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>여행지 검색</title>
+  <title>상세 정보</title>
   <!-- Flask를 위해 수정 (CSS 연결)-->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -18,6 +18,14 @@
     </div>
 
     <div class="app-screen">
+      <a href="{{ url_for('index') }}" class="logo-text-center">TripPick</a>
+
+      <!-- 뒤로가기 이미지 -->
+      <div class="back-section">
+        <img src="{{ url_for('static', filename='back-arrow.png') }}" class="back-icon" onclick="history.back()" alt="back">
+        <span class="page-title-left">상세 정보</span>
+      </div>
+
       <h2>상세 페이지</h2>
       <p>사진, 제목, 전화번호, 주소(카카오맵), 현재날씨와 예보(meteo-api), 특산물, 휴무일, 개장시간, 주차시설, 상세 소개, 숙박 정보</p>
       <!--  반려동물, 혼잡도 정보(별도의 api) -->
@@ -30,8 +38,6 @@
           </ul>
         </p>
       {% endif %}
-      <button type="button" onclick="history.back();">뒤로가기</button>
-      <!-- Flask 연동 -->
       <a href="{{ url_for('index') }}" class="app">홈으로</a>
       <!-- <button class="app" onclick="navigate('index.html')">홈으로</button> -->
     </div>
