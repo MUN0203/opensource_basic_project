@@ -180,6 +180,7 @@ def detail():
         'contentId': contentid,
         'defaultYN': 'Y',
         'overviewYN': 'Y',
+        'mapinfoYN': 'Y',
         '_type': 'json'
     }
 
@@ -192,33 +193,32 @@ def detail():
           item = items[0]
         elif isinstance(items, dict):
           item = items
-        else:
-          print("[DEBUG] 상세 정보가 없습니다.")
-          item = {}
-
     except Exception as e:
       print("TourAPI 상세 호출 실패:", e)
-      item = {}
 
     try:
         lat = float(item.get("mapy", 0))
         lon = float(item.get("mapx", 0))
-        print(f"[DEBUG] 위도: {lat}, 경도: {lon}")
     except Exception as e:
-        print("위도 경도 변환 실패:", e)
         lat, lon = 0, 0
 
     weather = "정보 없음"
     if lat != 0 and lon != 0:
         try:
             weather_result = get_kma_weather_multi([lat], [lon])
-            print(f"[DEBUG] 날씨 결과: {weather_result}")
-            if weather_result and isinstance(weather_result, list):
+            if (
+                isinstance(weather_result, list) and len(weather_result) > 0
+                and isinstance(weather_result[0], dict)
+                and weather_result[0].get("current") is not None
+                and not weather_result[0]["current"].get("error")
+                and "temperature" in weather_result[0]["current"]
+                and "weather_kr" in weather_result[0]["current"]
+            ):
                 weather = weather_result[0]
         except Exception as e:
             print("날씨 정보 조회 실패:", e)
 
-
+    # 특산물 API
     if spcprd_api_key :
         print(f"로드된 Tour API 키: {spcprd_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
         key_loaded2 = True
@@ -226,8 +226,6 @@ def detail():
         print("특산물 API 키를 로드하지 못했습니다. .env 파일을 확인하세요.")
         key_loaded2 = False
 
-    # print(items["addr1"])
-    # 특산물 API
     item_addr1 = item_addr1.split()
 
     def_params2 = {

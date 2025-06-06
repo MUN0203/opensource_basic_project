@@ -44,7 +44,7 @@
 
       <!-- 날씨 정보 -->
       <h2>현재 날씨</h2>
-      {% if weather and weather.current %}
+      {% if weather and weather.current and not weather.current.error %}
         <p>{{ weather.current.weather_kr | weather_emoji }} {{ weather.current.weather_kr }}</p>
         <p>기온: {{ weather.current.temperature }}℃</p>
         <p>관측 시각: {{ weather.current.time.strftime('%Y-%m-%d %H:%M') }}</p>
@@ -53,7 +53,7 @@
       {% endif %}
 
       <h2>일별 예보</h2>
-      {% if weather and weather.forecast %}
+      {% if weather and weather.forecast and not weather.forecast[0].error %}
         <ul>
           {% for day in weather.forecast %}
            <li>
