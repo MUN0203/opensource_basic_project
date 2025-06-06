@@ -45,7 +45,7 @@
               {% endif %}
               <div class="place-info">
                 <h3 class="place-title">
-                  <a href="{{ url_for('detail', item_addr1=item.addr1) }}" class="place-link">
+                  <a href="{{ url_for('detail', contentid=item.contentid, item_addr1=item.addr1, image_url=item.firstimage2 ) }}" class="place-link">
                     {{ item.title }}
                   </a>
                 </h3>

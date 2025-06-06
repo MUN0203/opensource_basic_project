@@ -3,6 +3,7 @@ import config
 from searchKeyword1 import searchKeyword1
 from searchTheme import searchTheme
 from spcprd3 import localSpcprd3
+import requests
 
 app = Flask(__name__)
 
@@ -118,7 +119,29 @@ def review():
 
 @app.route('/detail')
 def detail():
+    contentid = request.args.get('contentid')
     item_addr1 = request.args.get('item_addr1')
+    image_url = request.args.get('image_url')
+
+     # 1. 관광지 상세 정보 가져오기
+    detail_url = "http://apis.data.go.kr/B551011/KorService1/detailCommon1"
+    detail_params = {
+        'serviceKey': tour_api_key,
+        'MobileOS': "ETC",
+        'MobileApp': "TripPick",
+        'contentId': contentid,
+        'defaultYN': 'Y',
+        'overviewYN': 'Y',
+        '_type': 'json'
+    }
+
+    item = {}
+    try:
+        response = requests.get(detail_url, params=detail_params)
+        item = response.json()['response']['body']['items']['item'][0]
+    except Exception as e:
+        print("TourAPI 상세 호출 실패:", e)
+
     if spcprd_api_key :
         print(f"로드된 Tour API 키: {spcprd_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
         key_loaded2 = True
@@ -154,10 +177,9 @@ def detail():
         items2 = localSpcprd3(def_params2, item_addr1[1])
         
     print(items2)
-    
 
-    return render_template('detail.html', items2 = items2)
-
+    return render_template('detail.html', item=item, items2 = items2, image_url=image_url)
+ 
 if __name__ == '__main__':
     # debug_mode = app.config.get('DEBUG', False) # 예: Config 클래스에 DEBUG = True/False 추가
     app.run(debug=True) # 개발 중에는 True 사용
