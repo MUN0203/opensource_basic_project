@@ -51,7 +51,12 @@
                 </h3>
                 <p class="place-address">📍 {{ item.addr1 or '주소 정보 없음' }}</p>
                 <p class="place-phone">☎️ {{ item.tel or '전화번호 정보 없음' }}</p>
-                <p class="placeholder">🌦 날씨 정보 (예정)</p>
+               <p class="place-weather">
+                 {{ item.weather_status | weather_emoji }} {{ item.weather_status or '날씨 정보 없음' }}
+                 {% if item.weather and item.weather.current and item.weather.current.temperature is not none %}
+                   ({{ item.weather.current.temperature }}℃)
+                 {% endif %}
+               </p>
                 <p class="placeholder">🗺️ 카카오맵 위치 (예정)</p>
               </div>
             </div>

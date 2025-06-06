@@ -42,6 +42,31 @@
       <h3>소개</h3>
       <p>{{ item.overview | safe }}</p>
 
+      <!-- 날씨 정보 -->
+      <h2>현재 날씨</h2>
+      {% if weather and weather.current %}
+        <p>{{ weather.current.weather_kr | weather_emoji }} {{ weather.current.weather_kr }}</p>
+        <p>기온: {{ weather.current.temperature }}℃</p>
+        <p>관측 시각: {{ weather.current.time.strftime('%Y-%m-%d %H:%M') }}</p>
+      {% else %}
+        <p>날씨 정보 없음</p>
+      {% endif %}
+
+      <h2>일별 예보</h2>
+      {% if weather and weather.forecast %}
+        <ul>
+          {% for day in weather.forecast %}
+           <li>
+             {{ day.date.strftime('%m/%d') }}:
+             {{ day.weather_kr | weather_emoji }} {{ day.weather_kr }},
+             최고: {{ day.t_max }}℃ / 최저: {{ day.t_min }}℃
+           </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>예보 없음</p>
+      {% endif %}
+
       <!-- 추가 정보가 있다면 표시 -->
       {% if items2 %}
         <h3>특산물 정보</h3>

@@ -308,3 +308,9 @@ body {
   color: #777;
   margin: 0.2rem 0;
 }
+
+.place-weather {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+}

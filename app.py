@@ -4,8 +4,30 @@ from searchKeyword1 import searchKeyword1
 from searchTheme import searchTheme
 from spcprd3 import localSpcprd3
 import requests
+from weather import get_kma_weather_multi
+
+def weather_emoji(weather_desc):
+    if not weather_desc:
+        return "🌦"
+    weather_desc = weather_desc.lower()
+    if "맑음" in weather_desc or "clear" in weather_desc:
+        return "☀️"
+    elif "구름" in weather_desc or "cloud" in weather_desc:
+        return "☁️"
+    elif "비" in weather_desc or "rain" in weather_desc:
+        return "🌧️"
+    elif "눈" in weather_desc or "snow" in weather_desc:
+        return "❄️"
+    elif "안개" in weather_desc or "fog" in weather_desc or "흐림" in weather_desc:
+        return "🌫️"
+    elif "천둥" in weather_desc or "thunder" in weather_desc:
+        return "⛈️"
+    else:
+        return "🌦"
 
 app = Flask(__name__)
+
+app.jinja_env.filters['weather_emoji'] = weather_emoji
 
 # Tour API 키 import
 tour_api_key = config.Config.getTOUR_API_KEY()
@@ -51,6 +73,32 @@ def search():
     if request.method == 'POST':
         keyword = request.form.get('keyword', '').strip()
         items = searchKeyword1(def_params, keyword)
+
+        locs = []
+        for item in items:
+            try:
+                lat = float(item.get('mapy', 0))
+                lon = float(item.get('mapx', 0))
+                locs.append((lat, lon))
+            except Exception:
+                locs.append((0, 0))  
+
+        # 위도, 경도 분리
+        lats = [lat for lat, lon in locs]
+        lons = [lon for lat, lon in locs]
+
+        # 날씨 정보 가져오기
+        weather_list = get_kma_weather_multi(lats, lons)
+
+        for i, item in enumerate(items):
+           weather = weather_list[i] if i < len(weather_list) else None
+
+           if isinstance(weather, dict) and weather.get("current"):
+              item['weather'] = weather
+              item['weather_status'] = weather["current"].get("weather_kr", "날씨 정보 없음")
+           else:
+              item['weather'] = None
+              item['weather_status'] = "날씨 정보 없음"
 
     return render_template(
         'search.html',
@@ -138,9 +186,38 @@ def detail():
     item = {}
     try:
         response = requests.get(detail_url, params=detail_params)
-        item = response.json()['response']['body']['items']['item'][0]
+        items = response.json()['response']['body']['items']['item']
+
+        if isinstance(items, list) and len(items) > 0:
+          item = items[0]
+        elif isinstance(items, dict):
+          item = items
+        else:
+          print("[DEBUG] 상세 정보가 없습니다.")
+          item = {}
+
     except Exception as e:
-        print("TourAPI 상세 호출 실패:", e)
+      print("TourAPI 상세 호출 실패:", e)
+      item = {}
+
+    try:
+        lat = float(item.get("mapy", 0))
+        lon = float(item.get("mapx", 0))
+        print(f"[DEBUG] 위도: {lat}, 경도: {lon}")
+    except Exception as e:
+        print("위도 경도 변환 실패:", e)
+        lat, lon = 0, 0
+
+    weather = "정보 없음"
+    if lat != 0 and lon != 0:
+        try:
+            weather_result = get_kma_weather_multi([lat], [lon])
+            print(f"[DEBUG] 날씨 결과: {weather_result}")
+            if weather_result and isinstance(weather_result, list):
+                weather = weather_result[0]
+        except Exception as e:
+            print("날씨 정보 조회 실패:", e)
+
 
     if spcprd_api_key :
         print(f"로드된 Tour API 키: {spcprd_api_key[:4]}... (보안을 위해 일부만 출력)") # 서버 로그에 출력
@@ -152,8 +229,6 @@ def detail():
     # print(items["addr1"])
     # 특산물 API
     item_addr1 = item_addr1.split()
-    # print(item_addr1[1])
-
 
     def_params2 = {
         "apiKey" : spcprd_api_key,
@@ -178,7 +253,7 @@ def detail():
         
     print(items2)
 
-    return render_template('detail.html', item=item, items2 = items2, image_url=image_url)
+    return render_template('detail.html', item=item, items2 = items2, image_url=image_url, weather=weather)
  
 if __name__ == '__main__':
     # debug_mode = app.config.get('DEBUG', False) # 예: Config 클래스에 DEBUG = True/False 추가
