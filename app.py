@@ -144,8 +144,6 @@ def review():
 @app.route('/detail')
 def detail():
     contentid = request.args.get('contentid')
-    item_addr1 = request.args.get('item_addr1')
-
     image_url = request.args.get('image_url')
 
      # 1. 관광지 상세 정보 가져오기
@@ -164,14 +162,28 @@ def detail():
     item = {}
     try:
         response = requests.get(detail_url, params=detail_params)
+        print("✅ TourAPI 응답 상태코드:", response.status_code)
+        print("✅ TourAPI 응답 내용:", response.text[:500])  # 너무 길면 500자만
         items = response.json()['response']['body']['items']['item']
 
         if isinstance(items, list) and len(items) > 0:
           item = items[0]
         elif isinstance(items, dict):
           item = items
+
+        addr_from_param = request.args.get('item_addr1', None)
+        if item.get("addr1") is None and addr_from_param:
+           item["addr1"] = addr_from_param
+           
     except Exception as e:
       print("TourAPI 상세 호출 실패:", e)
+
+    print("addr1:", item.get("addr1"))
+    print("mapx:", item.get("mapx"))
+    print("mapy:", item.get("mapy"))
+
+    item_addr1 = item.get("addr1", "").split()
+    print("item_addr1:", item_addr1)
 
     try:
         lat = float(item.get("mapy", 0))
@@ -179,6 +191,7 @@ def detail():
     except Exception as e:
         lat, lon = 0, 0
 
+    # 날씨 정보  
     weather = "정보 없음"
     if lat != 0 and lon != 0:
         try:
@@ -195,35 +208,43 @@ def detail():
         except Exception as e:
             print("날씨 정보 조회 실패:", e)
 
-
+    # 특산물 API 키 확인
     key_loaded2 = bool(spcprd_api_key)
     if key_loaded2:
         print(f"로드된 특산물 API 키: {spcprd_api_key[:4]}...")
     else:
         print("특산물 API 키를 로드하지 못했습니다.")
 
-    item_addr1 = item_addr1.split()
-
     def_params2 = {
         "apiKey": spcprd_api_key,
         "BASE_URL": "http://api.nongsaro.go.kr/service/localSpcprd"
     }
 
-    print(item_addr1)
 
-    if item_addr1[0] in ["부산광역시", "대구광역시", "광주광역시", "인천광역시", "울산광역시", "세종특별자치시"]:
-        if item_addr1[1] in ["기장군", "달성군", "강화군", "옹진군"]:
-            items2 = localSpcprd3(def_params2, item_addr1[1])
+    if len(item_addr1) >= 2:
+        if item_addr1[0] in ["부산광역시", "대구광역시", "광주광역시", "인천광역시", "울산광역시", "세종특별자치시"]:
+            if item_addr1[1] in ["기장군", "달성군", "강화군", "옹진군"]:
+                items2 = localSpcprd3(def_params2, item_addr1[1])
+            else:
+                items1 = localSpcprd3(def_params2, item_addr1[0])
+                excluded_keywords = ['달성군', '기장군', '강화군', '옹진군']
+                items2 = [item for item in items1 if not any(keyword in item.get('areaNm', '') for keyword in excluded_keywords)]
         else:
-            items1 = localSpcprd3(def_params2, item_addr1[0])
-            excluded_keywords = ['달성군', '기장군', '강화군', '옹진군']
-            items2 = [item for item in items1 if not any(keyword in item.get('areaNm', '') for keyword in excluded_keywords)]
+            items2 = localSpcprd3(def_params2, item_addr1[1])
     else:
-        items2 = localSpcprd3(def_params2, item_addr1[1])
+        items2 = []
+   
+    print("특산물 items2:", items2)
 
-    print(items2)
+    return render_template(
+        'detail.html',
+        item=item,
+        items2=items2,
+        image_url=image_url,
+        weather=weather,
+        kakao_api_key=KAKAO_API_KEY  
+    )
 
-    return render_template('detail.html', item=item, items2 = items2, image_url=image_url, weather=weather)
  
 if __name__ == '__main__':
     app.run(debug=True)

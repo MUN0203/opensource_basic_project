@@ -42,6 +42,12 @@
       <h3>소개</h3>
       <p>{{ item.overview | safe }}</p>
 
+      <h3>주소</h3>
+      <p>{{ item.addr1 }}</p>
+
+      <h3>지도</h3>
+      <div id="map"></div>
+
       <!-- 날씨 정보 -->
       <h2>현재 날씨</h2>
       {% if weather and weather.current and not weather.current.error %}
@@ -96,6 +102,27 @@
     }
     setInterval(updateTime, 1000);
     updateTime();
+  </script>
+
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_api_key }}&libraries=services"></script>
+  <script>
+    const container = document.getElementById('map');
+    const options = {
+      center: new kakao.maps.LatLng({{ item.mapy }}, {{ item.mapx }}),
+      level: 3
+    };
+
+    const map = new kakao.maps.Map(container, options);
+
+    const marker = new kakao.maps.Marker({
+      position: new kakao.maps.LatLng({{ item.mapy }}, {{ item.mapx }})
+    });
+    marker.setMap(map);
+
+    const infowindow = new kakao.maps.InfoWindow({
+      content: '<div style="padding:5px;font-size:14px;">{{ item.title }}</div>'
+    });
+    infowindow.open(map, marker);
   </script>
 </body>
 </html>

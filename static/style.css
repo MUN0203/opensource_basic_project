@@ -330,6 +330,19 @@ body {
 }
 
 .map-button:hover {
-  color: #000; /* 마우스 올렸을 때 진한 검정 */
+  color: #000; 
   text-decoration: none;
+}
+
+.app-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* ✅ 전체 가운데 정렬 */
+}
+
+#map {
+  width: 100%;
+  max-width: 400px;  /* 💡 디바이스 폭 제한 */
+  height: 300px;
+  background-color: #eee;
 }
