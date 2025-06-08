@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>리뷰 상세 보기</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="iphone-frame">
+    <div class="dynamic-island">
+      <div class="time" id="currentTime">12:00</div>
+      <div class="island"></div>
+      <div class="status-icons">
+        <img src="{{ url_for('static', filename='doc.png') }}" alt="status icons" class="status-img">
+      </div>
+    </div>
+
+    <div class="app-screen">
+      <h2>{{ review.title }}</h2>
+      <p><strong>작성자:</strong> {{ review.user }} | {{ review.timestamp }}</p>
+      <p><strong>테마:</strong> {{ review.theme }}</p>
+      <p>{{ review.content }}</p>
+
+      {% if review.image %}
+        <img src="{{ url_for('static', filename=review.image) }}" alt="리뷰 이미지" class="review-img">
+      {% endif %}
+
+      <!-- 좋아요 -->
+      <form method="post" action="{{ url_for('like_review', review_id=review.doc_id) }}">
+        <button type="submit">👍🏻 좋아요 {{ review.likes or 0 }}</button>
+      </form>
+
+      <!-- 댓글 작성 -->
+      {% if session.get('user_id') %}
+      <form method="post" action="{{ url_for('add_comment', review_id=review.doc_id) }}">
+        <input type="text" name="comment" placeholder="댓글을 입력하세요" required class="input-box">
+        <button type="submit">댓글 작성</button>
+      </form>
+      {% endif %}
+
+      <!-- 댓글 목록 -->
+      {% if review.comments %}
+        <div class="comments">
+          <p><strong>댓글 목록:</strong></p>
+          <ul>
+            {% for comment in review.comments %}
+              <li>
+                <strong>{{ comment.user }}</strong>: {{ comment.text }}
+                <span style="font-size: 0.85em; color: gray;">({{ comment.timestamp }})</span>
+
+                {% if session.get('user_id') and comment.user == current_user %}
+                  <form method="get" action="{{ url_for('edit_comment', review_id=review.doc_id, comment_id=comment.id) }}" style="display:inline;">
+                    <button type="submit">✏️</button>
+                  </form>
+                  <form method="post" action="{{ url_for('delete_comment', review_id=review.doc_id, comment_id=comment.id) }}" style="display:inline;">
+                    <button type="submit">🗑</button>
+                  </form>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- 리뷰 수정 및 삭제 버튼 (작성자에게만 표시) -->
+      {% if session.get('user_id') and review.user == current_user %}
+        <form method="get" action="{{ url_for('edit_review', review_id=review.doc_id) }}">
+          <button type="submit">✏️ 리뷰 수정</button>
+        </form>
+        <form method="post" action="{{ url_for('delete_review', review_id=review.doc_id) }}">
+          <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?')">🗑 리뷰 삭제</button>
+        </form>
+      {% endif %}
+
+      <a href="{{ url_for('review') }}">← 리뷰 목록으로 돌아가기</a>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+</body>
+</html>

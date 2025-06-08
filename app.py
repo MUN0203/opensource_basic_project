@@ -6,6 +6,13 @@ from tinydb import Query
 from flask_bcrypt import Bcrypt     # 비밀번호 해싱을 위해 사용
 from flask_session import Session   # 서버 측 세션 관리
 
+# 리뷰기능 관련 
+from werkzeug.utils import secure_filename
+from functools import wraps
+from datetime import datetime
+import os
+import uuid
+
 # API 키
 import config
 
@@ -28,6 +35,12 @@ app.secret_key = 'testSecretkey'
 Session(app)
 bcrypt = Bcrypt(app)
 
+#리뷰기능 관련
+# 업로드 기능
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 # flask-tinydb 초기화
 # 기본적으로 인스턴스 폴더에 'database.json' 파일을 생성/사용
@@ -37,6 +50,197 @@ db = TinyDB(app).get_db()
 usersTable = db.table("users")
 reviewsTable = db.table("reviews")
 favoritesTable = db.table("favorites") # 즐겨찾기
+
+# 리뷰 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('로그인이 필요합니다.')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return wrap
+
+@app.route('/review')
+def reviews():
+    items = []
+    for item in reviewsTable:
+        review = item.copy()
+        review['doc_id'] = item.doc_id
+        items.append(review)
+
+    current_user = None
+    if session.get('user_id'):
+        user = usersTable.get(doc_id=session['user_id'])
+        current_user = user['username'] if user else None
+
+    return render_template('review.html', reviews=items, current_user=current_user)
+
+@app.route('/review/write', methods=['GET'])
+@login_required
+def write_review():
+    return render_template('write_review.html')
+
+@app.route('/review/write', methods=['POST'])
+@login_required
+def submit_review():
+    title = request.form['title']
+    content = request.form['content']
+    theme = request.form['theme']
+    image = request.files.get('image')
+
+    img_path = None
+    if image and allowed_file(image.filename):
+        filename = secure_filename(image.filename)
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(save_path)
+        img_path = os.path.join('uploads', filename)
+
+    user = usersTable.get(doc_id=session['user_id'])
+
+    reviewsTable.insert({
+        'user': user['username'],
+        'title': title,
+        'content': content,
+        'theme': theme,
+        'image': img_path,
+        'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+        'likes': 0,
+        'liked_users': [],
+        'comments': []
+    })
+
+    flash('리뷰가 등록되었습니다.')
+    return redirect(url_for('reviews'))
+
+# 리뷰 디테일페이지로
+@app.route('/review/<int:review_id>')
+def review_detail(review_id):
+    review = reviewsTable.get(doc_id=review_id)
+    if not review:
+        flash('리뷰가 존재하지 않습니다.')
+        return redirect(url_for('reviews'))
+
+    current_user = None
+    if session.get('user_id'):
+        user = usersTable.get(doc_id=session['user_id'])
+        current_user = user['username'] if user else None
+
+    return render_template('review_detail.html', review=review, current_user=current_user)
+
+# 댓글 기능
+@app.route('/review/<int:review_id>/comment', methods=['POST'])
+@login_required
+def add_comment(review_id):
+    comment_text = request.form['comment']
+    user = usersTable.get(doc_id=session['user_id'])
+    comment = {
+        'user': user['username'],
+        'text': comment_text,
+        'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+        'id': str(uuid.uuid4())
+    }
+
+    review = reviewsTable.get(doc_id=review_id)
+    if review:
+        comments = review.get('comments', [])
+        comments.append(comment)
+        reviewsTable.update({'comments': comments}, doc_ids=[review_id])
+    return redirect(url_for('review_detail', review_id=review_id))
+
+# 댓글 수정
+@app.route('/review/<int:review_id>/comment/<comment_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_comment(review_id, comment_id):
+    review = reviewsTable.get(doc_id=review_id)
+    if not review:
+        flash('리뷰가 존재하지 않습니다.')
+        return redirect(url_for('reviews'))
+
+    comments = review.get('comments', [])
+    comment = next((c for c in comments if c['id'] == comment_id), None)
+    if not comment or comment['user'] != usersTable.get(doc_id=session['user_id'])['username']:
+        flash('수정 권한이 없습니다.')
+        return redirect(url_for('review_detail', review_id=review_id))
+
+    if request.method == 'POST':
+        new_text = request.form['comment']
+        comment['text'] = new_text
+        reviewsTable.update({'comments': comments}, doc_ids=[review_id])
+        flash('댓글이 수정되었습니다.')
+        return redirect(url_for('review_detail', review_id=review_id))
+
+    return render_template('edit_comment.html', comment=comment, review_id=review_id)
+
+# 리뷰 좋아요 (1회원 1회)
+@app.route('/review/<int:review_id>/like', methods=['POST'])
+@login_required
+def like_review(review_id):
+    user_id = session['user_id']
+    review = reviewsTable.get(doc_id=review_id)
+    if review:
+        liked_users = review.get('liked_users', [])
+        if user_id not in liked_users:
+            review['likes'] = review.get('likes', 0) + 1
+            liked_users.append(user_id)
+            reviewsTable.update({'likes': review['likes'], 'liked_users': liked_users}, doc_ids=[review_id])
+    return redirect(url_for('review_detail', review_id=review_id))
+
+# 댓글 삭제
+@app.route('/review/<int:review_id>/comment/<comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(review_id, comment_id):
+    review = reviewsTable.get(doc_id=review_id)
+    if not review:
+        flash('리뷰가 존재하지 않습니다.')
+        return redirect(url_for('reviews'))
+
+    user = usersTable.get(doc_id=session['user_id'])
+    comments = review.get('comments', [])
+    new_comments = [c for c in comments if not (c['id'] == comment_id and c['user'] == user['username'])]
+
+    if len(comments) != len(new_comments):
+        reviewsTable.update({'comments': new_comments}, doc_ids=[review_id])
+        flash('댓글이 삭제되었습니다.')
+    else:
+        flash('삭제 권한이 없습니다.')
+
+    return redirect(url_for('review_detail', review_id=review_id))
+
+# 리뷰 삭제
+@app.route('/review/<int:review_id>/delete', methods=['POST'])
+@login_required
+def delete_review(review_id):
+    review = reviewsTable.get(doc_id=review_id)
+    if review and review['user'] == usersTable.get(doc_id=session['user_id'])['username']:
+        reviewsTable.remove(doc_ids=[review_id])
+    return redirect(url_for('reviews'))
+
+# 리뷰 수정
+@app.route('/review/<int:review_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_review(review_id):
+    review = reviewsTable.get(doc_id=review_id)
+    if not review or review['user'] != usersTable.get(doc_id=session['user_id'])['username']:
+        flash('권한이 없습니다.')
+        return redirect(url_for('reviews'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        theme = request.form['theme']
+        reviewsTable.update({'title': title, 'content': content, 'theme': theme}, doc_ids=[review_id])
+        flash('리뷰가 수정되었습니다.')
+        return redirect(url_for('review_detail', review_id=review_id))
+
+    return render_template('edit_review.html', review=review)
+
+
+
+
 
 # Tour API 키 import
 tour_api_key = config.Config.getTOUR_API_KEY()

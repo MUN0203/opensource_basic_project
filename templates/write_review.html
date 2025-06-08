@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>리뷰 작성</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="iphone-frame">
+    <div class="dynamic-island">
+      <div class="time" id="currentTime">12:00</div>
+      <div class="island"></div>
+      <div class="status-icons">
+        <img src="{{ url_for('static', filename='doc.png') }}" alt="status icons" class="status-img">
+      </div>
+    </div>
+
+    <div class="app-screen">
+      <h2>리뷰 작성</h2>
+      <form action="{{ url_for('submit_review') }}" method="post" enctype="multipart/form-data">
+        <label for="title">제목:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="content">내용:</label><br>
+        <textarea id="content" name="content" rows="4" required></textarea><br><br>
+
+        <label for="theme">테마 선택:</label><br>
+        <select id="theme" name="theme" required>
+          <option value="힐링">힐링</option>
+          <option value="액티비티">액티비티</option>
+          <option value="기타">사진명소</option>
+          <option value="먹거리">먹거리</option>
+        
+        </select><br><br>
+
+        <label for="image">사진 첨부:</label><br>
+        <input type="file" id="image" name="image" accept="image/*"><br><br>
+
+        <button type="submit">작성 완료</button>
+      </form>
+
+      <a href="{{ url_for('review') }}" class="app">리뷰 목록으로</a>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+</body>
+</html>

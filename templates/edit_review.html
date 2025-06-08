@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>리뷰 수정</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="iphone-frame">
+    <div class="dynamic-island">
+      <div class="time" id="currentTime">12:00</div>
+      <div class="island"></div>
+      <div class="status-icons">
+        <img src="{{ url_for('static', filename='doc.png') }}" alt="status icons" class="status-img">
+      </div>
+    </div>
+
+    <div class="app-screen">
+      <h2>리뷰 수정</h2>
+      <form method="POST" action="{{ url_for('edit_review', review_id=review.doc_id) }}">
+        <label>제목:</label>
+        <input type="text" name="title" value="{{ review.title }}" required><br>
+
+        <label>내용:</label>
+        <textarea name="content" required>{{ review.content }}</textarea><br>
+
+        <label>테마 선택:</label>
+        <select name="theme" required>
+          <option value="힐링" {% if review.theme == '힐링' %}selected{% endif %}>힐링</option>
+          <option value="액티비티" {% if review.theme == '액티비티' %}selected{% endif %}>액티비티</option>
+          <option value="먹거리" {% if review.theme == '먹거리' %}selected{% endif %}>먹거리</option>
+          <option value="기타" {% if review.theme == '기타' %}selected{% endif %}>기타</option>
+        </select><br>
+
+        <button type="submit">수정 완료</button>
+      </form>
+      <a href="{{ url_for('review') }}">← 돌아가기</a>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+</body>
+</html>

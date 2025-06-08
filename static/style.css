@@ -325,3 +325,13 @@ body {
   text-decoration: none;   
   color: black; 
 }
+
+.comment-edit-area {
+  width: 90%;
+  height: 100px;
+  padding: 8px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
