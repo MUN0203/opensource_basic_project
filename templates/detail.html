@@ -18,6 +18,13 @@
     </div>
 
     <div class="app-screen">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <script>
+            alert("{{ messages[-1] }}");
+          </script>
+        {% endif %}
+      {% endwith %}
       <a href="{{ url_for('index') }}" class="logo-text-center">TripPick</a>
 
       <div class="back-section">
@@ -62,6 +69,45 @@
             {% endfor %}
           </ul>
         </p>
+      {% endif %}
+
+      <h3>리뷰</h3>
+      {% if session.get('user_id') %}
+      <form action="{{ url_for('detail') }}?item_addr1={{ info.item_addr1 }}&contentid={{ info.contentid }}&image={{ info.image }}&title={{ info.title }}&tel={{ info.tel }}"
+            method="post" enctype="multipart/form-data">
+        <label for="title">제목:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="content">내용:</label><br>
+        <textarea id="content" name="content" rows="3" required></textarea><br><br>
+        <label for="theme">테마:</label><br>
+        <select id="theme" name="theme">
+          <option value="힐링">힐링</option>
+          <option value="액티비티">액티비티</option>
+          <option value="사진명소">사진명소</option>
+          <option value="먹거리">먹거리</option>
+          <option value="기타">기타</option>
+        </select><br><br>
+        <label for="image">사진 첨부:</label><br>
+        <input type="file" id="image" name="image" accept="image/*"><br><br>
+        <button type="submit">리뷰 작성</button>
+      </form>
+      {% else %}
+      <p>리뷰를 작성하려면 로그인 해주세요. <a href="{{ url_for('login') }}">로그인</a></p>
+      {% endif %}
+
+      {% if reviews %}
+      <ul class="place-review-list">
+        {% for review in reviews %}
+          <li class="place-review-item">
+            <h4>{{ review.title }}</h4>
+            <p>{{ review.content }}</p>
+            <p>작성자: {{ review.user }} | {{ review.timestamp }}</p>
+            <a href="{{ url_for('review_detail', review_id=review.doc_id) }}">리뷰 상세</a>
+          </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>아직 등록된 리뷰가 없습니다.</p>
       {% endif %}
 
       <!-- Flask 연동 -->
