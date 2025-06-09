@@ -17,8 +17,41 @@
     </div>
 
     <div class="app-screen">
+      <h3>관광지 검색</h3>
+      <form method="get" action="{{ url_for('write_review') }}">
+        <input type="text" name="keyword" placeholder="키워드를 입력하세요" value="{{ keyword or '' }}">
+        <button type="submit">검색</button>
+      </form>
+      {% if places %}
+      <ul class="place-search-results">
+        {% for place in places %}
+        <li>
+          <p>{{ place.title }}</p>
+          <form method="get" action="{{ url_for('write_review') }}">
+            <input type="hidden" name="keyword" value="{{ keyword }}">
+            <input type="hidden" name="contentid" value="{{ place.contentid }}">
+            <input type="hidden" name="item_addr1" value="{{ place.addr1 }}">
+            <input type="hidden" name="image" value="{{ place.image }}">
+            <input type="hidden" name="title" value="{{ place.title }}">
+            <input type="hidden" name="tel" value="{{ place.tel }}">
+            <button type="submit">이 장소 선택</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% if contentid %}
+        <p>선택된 장소: {{ title }} ({{ item_addr1 }})</p>
+      {% endif %}
       <h2>리뷰 작성</h2>
       <form action="{{ url_for('submit_review') }}" method="post" enctype="multipart/form-data">
+        {% if contentid %}
+          <input type="hidden" name="contentid" value="{{ contentid }}">
+          <input type="hidden" name="item_addr1" value="{{ item_addr1 }}">
+          <input type="hidden" name="place_image" value="{{ image }}">
+          <input type="hidden" name="place_title" value="{{ title }}">
+          <input type="hidden" name="place_tel" value="{{ tel }}">
+        {% endif %}
         <label for="title">제목:</label><br>
         <input type="text" id="title" name="title" required><br><br>
 
@@ -29,9 +62,9 @@
         <select id="theme" name="theme" required>
           <option value="힐링">힐링</option>
           <option value="액티비티">액티비티</option>
-          <option value="기타">사진명소</option>
+          <option value="사진명소">사진명소</option>
           <option value="먹거리">먹거리</option>
-        
+          <option value="기타">기타</option>
         </select><br><br>
 
         <label for="image">사진 첨부:</label><br>
