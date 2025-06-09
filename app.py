@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
 
 # 데이터베이스 관련
-from flask_tinydb import TinyDB     
-from tinydb import Query            
+from flask_tinydb import TinyDB
+from tinydb import Query
 from flask_bcrypt import Bcrypt     # 비밀번호 해싱을 위해 사용
 from flask_session import Session   # 서버 측 세션 관리
 
@@ -82,7 +82,25 @@ def reviews():
 @app.route('/review/write', methods=['GET'])
 @login_required
 def write_review():
-    return render_template('write_review.html')
+    keyword = request.args.get('keyword', '').strip()
+    places = []
+    if keyword:
+        def_params = {
+            "SERVICE_KEY": config.Config.getTOUR_API_KEY(),
+            "MOBILE_OS": "ETC",
+            "MOBILE_APP": "MyTravelApp",
+            "BASE_URL": "http://apis.data.go.kr/B551011/KorService1"
+        }
+        places = searchKeyword1(def_params, keyword)
+
+    contentid = request.args.get('contentid')
+    item_addr1 = request.args.get('item_addr1')
+    place_image = request.args.get('image')
+    place_title = request.args.get('title')
+    place_tel = request.args.get('tel')
+    return render_template('write_review.html', keyword=keyword, places=places,
+                           contentid=contentid, item_addr1=item_addr1, image=place_image,
+                           title=place_title, tel=place_tel)
 
 @app.route('/review/write', methods=['POST'])
 @login_required
@@ -99,6 +117,13 @@ def submit_review():
         image.save(save_path)
         img_path = os.path.join('uploads', filename)
 
+    # 장소 정보 가져오기
+    contentid = request.form.get('contentid')
+    item_addr1 = request.form.get('item_addr1')
+    place_image = request.form.get('place_image')
+    place_title = request.form.get('place_title')
+    place_tel = request.form.get('place_tel')
+
     user = usersTable.get(doc_id=session['user_id'])
 
     reviewsTable.insert({
@@ -110,11 +135,21 @@ def submit_review():
         'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
         'likes': 0,
         'liked_users': [],
-        'comments': []
+        'comments': [],
+        'contentid': contentid,
+        'place_addr1': item_addr1,
+        'place_image': place_image,
+        'place_title': place_title,
+        'place_tel': place_tel
     })
 
     flash('리뷰가 등록되었습니다.')
-    return redirect(url_for('reviews'))
+    return redirect(url_for('detail',
+                            item_addr1=item_addr1,
+                            contentid=contentid,
+                            image=place_image,
+                            title=place_title,
+                            tel=place_tel))
 
 # 리뷰 디테일페이지로
 @app.route('/review/<int:review_id>')
@@ -217,7 +252,8 @@ def delete_review(review_id):
     review = reviewsTable.get(doc_id=review_id)
     if review and review['user'] == usersTable.get(doc_id=session['user_id'])['username']:
         reviewsTable.remove(doc_ids=[review_id])
-    return redirect(url_for('reviews'))
+    next_page = request.form.get('next') or url_for('reviews')
+    return redirect(next_page)
 
 # 리뷰 수정
 @app.route('/review/<int:review_id>/edit', methods=['GET', 'POST'])
@@ -294,8 +330,8 @@ def register():
             'hashed_password': hashed_password
         })
 
-        flash('회원가입이 완료되었습니다. 로그인해주세요.')
-        return redirect(url_for('login'))
+        flash('회원가입이 완료되었습니다.')
+        return redirect(url_for('reviews'))
 
     # GET 요청일 때는 가입 폼 렌더링
     return render_template('register.html')
@@ -325,15 +361,16 @@ def login():
 
         # 4) 로그인 성공 → 세션에 사용자 정보 저장
         session['user_id'] = user_doc.doc_id
-        # flash('로그인 성공!')
-        return redirect(url_for('index'))
+        flash('로그인 되었습니다.')
+        return redirect(url_for('reviews'))
 
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    flash('로그아웃 되었습니다.')
+    return redirect(url_for('reviews'))
 
 
 # 대시보드(로그인 후 접근) 페이지
@@ -346,7 +383,10 @@ def dashboard():
 
     # 현재 로그인한 사용자의 정보를 가져옴
     user = usersTable.get(doc_id=session['user_id'])
-    return render_template('dashboard.html', user=user)
+    # 사용자가 작성한 리뷰 불러오기
+    ReviewQuery = Query()
+    user_reviews = reviewsTable.search(ReviewQuery.user == user['username'])
+    return render_template('dashboard.html', user=user, reviews=user_reviews)
 
 
 # 여행지 검색 페이지
@@ -450,9 +490,59 @@ def review():
     # 여기에 날씨 확인 관련 로직 추가 가능
     return render_template('review.html')
 
-# 상세페이지
-@app.route('/detail')
+@app.route('/detail', methods=['GET', 'POST'])
 def detail():
+    # 상세 페이지에서 리뷰 제출 처리
+    if request.method == 'POST':
+        if 'user_id' not in session:
+            flash('로그인이 필요합니다.')
+            return redirect(url_for('login'))
+
+        title = request.form['title']
+        content = request.form['content']
+        theme = request.form['theme']
+        image_file = request.files.get('image')
+
+        img_path = None
+        if image_file and allowed_file(image_file.filename):
+            filename = secure_filename(image_file.filename)
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_file.save(save_path)
+            img_path = os.path.join('uploads', filename)
+
+        item_addr1 = request.args.get('item_addr1')
+        contentid = request.args.get('contentid')
+        place_image = request.args.get('image')
+        place_title = request.args.get('title')
+        place_tel = request.args.get('tel')
+
+        # 리뷰 입력
+        user = usersTable.get(doc_id=session['user_id'])
+        reviewsTable.insert({
+            'user': user['username'],
+            'title': title,
+            'content': content,
+            'theme': theme,
+            'image': img_path,
+            'timestamp': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            'likes': 0,
+            'liked_users': [],
+            'comments': [],
+            'contentid': contentid,
+            'place_addr1': item_addr1,
+            'place_image': place_image,
+            'place_title': place_title,
+            'place_tel': place_tel
+        })
+        flash('리뷰가 등록되었습니다.')
+
+        return redirect(url_for('detail',
+                                item_addr1=item_addr1,
+                                contentid=contentid,
+                                image=place_image,
+                                title=place_title,
+                                tel=place_tel))
+
     def_params = {
         "SERVICE_KEY": config.Config.getTOUR_API_KEY(),
         "MOBILE_OS": "ETC",
@@ -525,14 +615,21 @@ def detail():
     if detailInfo['item'][0]['overview'] == "-" or detailInfo['item'][0]['overview'] == "":
         keywordResult = ""
     else :
-        print(f'개요 테스트: {detailInfo['item'][0]['overview']}')
-
+        print(f'개요 테스트: {detailInfo["item"][0]["overview"]}')
         # 키워드 추출
         keywordResult = keywordExtraction(detailInfo['item'][0]['overview'])
         print()
         print(f'키워드 결과: {keywordResult}')
-    
-    return render_template('detail.html', items2 = items2, info = info, keywords = keywordResult)
+
+    # 리뷰 가져오기
+    ReviewQuery = Query()
+    place_reviews = reviewsTable.search(ReviewQuery.contentid == info['contentid'])
+
+    return render_template('detail.html',
+                           items2=items2,
+                           info=info,
+                           keywords=keywordResult,
+                           reviews=place_reviews)
 
 if __name__ == '__main__':
     # debug_mode = app.config.get('DEBUG', False) # 예: Config 클래스에 DEBUG = True/False 추가
