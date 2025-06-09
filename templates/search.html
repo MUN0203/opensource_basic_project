@@ -5,9 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>여행지 검색</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <!-- ✅ Kakao 지도 SDK 불러오기 -->
+  <script type="text/javascript"
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_api_key }}&libraries=services">
+  </script>
 </head>
 <body>
   <div class="iphone-frame">
+    <!-- Dynamic Island -->
     <div class="dynamic-island">
       <div class="time" id="currentTime">12:00</div>
       <div class="island"></div>
@@ -16,6 +22,7 @@
       </div>
     </div>
 
+    <!-- Main App Screen -->
     <div class="app-screen">
       <a href="{{ url_for('index') }}" class="logo-text-center">TripPick</a>
 
@@ -46,11 +53,10 @@
               <div class="place-info">
                 <h3 class="place-title">
                   <a href="{{ url_for('detail', 
-                  item_addr1=item.addr1, 
-                  contentid = item.contentid, 
-                  image = item.firstimage,
-                  title = item.title,
-                  tel = item.tel) }}" class="place-link">
+                  contentid=item.contentid, item_addr1=item.addr1, 
+                  image=item.firstimage,
+                  title=item.title,
+                  tel=item.tel, image_url=item.firstimage2) }}" class="place-link">
                     {{ item.title }}
                   </a>
                 </h3>
@@ -72,7 +78,13 @@
                     <p class="place-weather">🌦 날씨 정보 로드 실패</p>
                 {% endif %}
                 {# ----- 날씨 정보 출력 끝 ----- #}
-                <p class="placeholder">🗺️ 카카오맵 위치 (예정)</p>
+               </p>
+                <!-- 카카오맵 위치-->
+                <a class="map-button"
+                   href="https://map.kakao.com/?q={{ item.title | urlencode }}"
+                   target="_blank">
+                  🗺️ 카카오맵 위치 보기
+                </a>
               </div>
             </div>
           {% endfor %}
@@ -85,6 +97,7 @@
       <a href="{{ url_for('index') }}" class="app">홈으로</a>
     </div>
 
+    <!-- iPhone Home Indicator -->
     <div class="home-indicator"></div>
   </div>
 

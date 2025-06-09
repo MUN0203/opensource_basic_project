@@ -1,4 +1,3 @@
-
 import openmeteo_requests
 from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Union, Optional, Any
@@ -167,3 +166,4 @@ def get_kma_weather_multi(
         all_results[original_idx] = location_data_dict
 
     return all_results
+

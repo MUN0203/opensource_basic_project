@@ -309,6 +309,44 @@ body {
   margin: 0.2rem 0;
 }
 
+.place-weather {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+}
+
+.map-button {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 0.90em;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 6px;
+  display: inline-block;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.map-button:hover {
+  color: #000; 
+  text-decoration: none;
+}
+
+.app-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* ✅ 전체 가운데 정렬 */
+}
+
+#map {
+  width: 100%;
+  max-width: 400px;  /* 💡 디바이스 폭 제한 */
+  height: 300px;
+  background-color: #eee;
+}
+
 .login-logout {
   display: flex;
   justify-content: flex-end;

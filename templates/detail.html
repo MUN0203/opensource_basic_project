@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>여행지 검색</title>
+  <title>상세 정보</title>
   <!-- Flask를 위해 수정 (CSS 연결)-->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -18,37 +18,61 @@
     </div>
 
     <div class="app-screen">
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <script>
-            alert("{{ messages[-1] }}");
-          </script>
-        {% endif %}
-      {% endwith %}
       <a href="{{ url_for('index') }}" class="logo-text-center">TripPick</a>
 
+      <!-- 뒤로가기 이미지 -->
       <div class="back-section">
-        <img src="{{ url_for('static', filename='back-arrow.png') }}" alt="뒤로가기" class="back-icon" onclick="history.back()" />
-        <span class="page-title-left">상세 페이지</span>
+        <img src="{{ url_for('static', filename='back-arrow.png') }}" class="back-icon" onclick="history.back()" alt="back">
+        <span class="page-title-left">상세 정보</span>
       </div>
-      <!-- <h2>상세 페이지</h2> -->
-      <!--사진, 제목, 전화번호, 주소(카카오맵), 현재날씨와 예보(meteo-api), 특산물, 숙박 정보-->
 
-      <!-- 상세정보 출력 (임시로 디자인 X)-->
-      {% if info %}
-        <h3>{{ info.title }}</h3>
-        {% if info.item_addr1 %}
-          <p>📍 {{ info.item_addr1 }}</p>
-        {% endif %}
-        {% if info.tel %}
-          <p>☎️ {{ info.tel }}</p>
-        {% endif %}
-        {% if info.image %}
-          <p><img src="{{ info.image }}" alt="{{ info.title }}" class="place-image"></p>
-        {% else %}
-          <div class="place-image-placeholder">이미지 없음</div>
-        {% endif %}
+       <!-- 여행지 제목 -->
+      <h2>{{ item.title }}</h2>
+
+      <!-- 여행지 이미지 -->
+      {% if image_url %}
+        <img src="{{ image_url }}" alt="{{ item.title }}" class="detail-image">
+      {% elif item.firstimage %}
+        <img src="{{ item.firstimage }}" alt="{{ item.title }}" class="detail-image">
+      {% else %}
+        <p>이미지가 없습니다.</p>
       {% endif %}
+
+      <!-- 상세 설명 -->
+      <h3>소개</h3>
+      <p>{{ item.overview | safe }}</p>
+
+      <h3>주소</h3>
+      <p>{{ item.addr1 }}</p>
+
+      <h3>지도</h3>
+      <div id="map"></div>
+
+      <!-- 날씨 정보 -->
+      <h2>현재 날씨</h2>
+      {% if weather and weather.current and not weather.current.error %}
+        <p>{{ weather.current.weather_kr | weather_emoji }} {{ weather.current.weather_kr }}</p>
+        <p>기온: {{ weather.current.temperature }}℃</p>
+        <p>관측 시각: {{ weather.current.time.strftime('%Y-%m-%d %H:%M') }}</p>
+      {% else %}
+        <p>날씨 정보 없음</p>
+      {% endif %}
+
+      <h2>일별 예보</h2>
+      {% if weather and weather.forecast and not weather.forecast[0].error %}
+        <ul>
+          {% for day in weather.forecast %}
+           <li>
+             {{ day.date.strftime('%m/%d') }}:
+             {{ day.weather_kr | weather_emoji }} {{ day.weather_kr }},
+             최고: {{ day.t_max }}℃ / 최저: {{ day.t_min }}℃
+           </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>예보 없음</p>
+      {% endif %}
+
       <p>태그</p>
       {% if keywords %}
         <p>
@@ -62,13 +86,12 @@
 
       <p>이 지역의 특산물 목록</p>
       {% if items2 %}
-        <p>
-          <ul>
-            {% for item in items2 %}
-              <li>{{ item.cntntsSj }}</li>
-            {% endfor %}
-          </ul>
-        </p>
+        <h3>특산물 정보</h3>
+        <ul>
+          {% for it in items2 %}
+            <li>{{ it.cntntsSj }}</li>
+          {% endfor %}
+        </ul>
       {% endif %}
 
       <h3>리뷰</h3>
@@ -110,6 +133,16 @@
       <p>아직 등록된 리뷰가 없습니다.</p>
       {% endif %}
 
+      <!-- 추가 정보가 있다면 표시 -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <script>
+            alert("{{ messages[-1] }}");
+          </script>
+        {% endif %}
+      {% endwith %}
+
+
       <!-- Flask 연동 -->
       <a href="{{ url_for('index') }}" class="app">홈으로</a>
       <!-- <button class="app" onclick="navigate('index.html')">홈으로</button> -->
@@ -130,6 +163,27 @@
     }
     setInterval(updateTime, 1000);
     updateTime();
+  </script>
+
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_api_key }}&libraries=services"></script>
+  <script>
+    const container = document.getElementById('map');
+    const options = {
+      center: new kakao.maps.LatLng({{ item.mapy }}, {{ item.mapx }}),
+      level: 3
+    };
+
+    const map = new kakao.maps.Map(container, options);
+
+    const marker = new kakao.maps.Marker({
+      position: new kakao.maps.LatLng({{ item.mapy }}, {{ item.mapx }})
+    });
+    marker.setMap(map);
+
+    const infowindow = new kakao.maps.InfoWindow({
+      content: '<div style="padding:5px;font-size:14px;">{{ item.title }}</div>'
+    });
+    infowindow.open(map, marker);
   </script>
 </body>
 </html>
