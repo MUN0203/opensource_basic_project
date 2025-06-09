@@ -17,6 +17,21 @@
     </div>
 
     <div class="app-screen">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <script>
+            alert("{{ messages[-1] }}");
+          </script>
+        {% endif %}
+      {% endwith %}
+      <div class="login-logout">
+        {% if current_user %}
+          <a href="{{ url_for('dashboard') }}" class="app">{{ current_user }}</a>
+          <a href="{{ url_for('logout') }}" class="app">로그아웃</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="app">로그인</a>
+        {% endif %}
+      </div>
       <h2>리뷰</h2>
 
       {% if session.get('user_id') %}
@@ -29,8 +44,15 @@
 
       {% for item in reviews %}
         <div class="review-card">
+          {% if item.place_title %}
+            <p class="place-name">{{ item.place_title }}</p>
+          {% endif %}
+          <p class="review-user">
+            작성자: {{ item.user }}
+            {% if item.user == current_user %}(나의 리뷰){% endif %}
+          </p>
           <a href="{{ url_for('review_detail', review_id=item.doc_id) }}">
-            <h3>{{ item.title }}</h3>
+            <h3 style="text-align: center;">{{ item.title }}</h3>
           </a>
           {% if item.image %}
             <img src="{{ url_for('static', filename=item.image) }}" alt="리뷰 이미지" class="review-img">
