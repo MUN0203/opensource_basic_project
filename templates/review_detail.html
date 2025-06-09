@@ -17,6 +17,16 @@
     </div>
 
     <div class="app-screen">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <script>
+            alert("{{ messages[-1] }}");
+          </script>
+        {% endif %}
+      {% endwith %}
+      {% if review.place_title %}
+        <h3 class="place-name">관광지: {{ review.place_title }}</h3>
+      {% endif %}
       <h2>{{ review.title }}</h2>
       <p><strong>작성자:</strong> {{ review.user }} | {{ review.timestamp }}</p>
       <p><strong>테마:</strong> {{ review.theme }}</p>
@@ -73,6 +83,11 @@
         </form>
       {% endif %}
 
+      {% if review.contentid %}
+      <a href="{{ url_for('detail') }}?item_addr1={{ review.place_addr1 }}&contentid={{ review.contentid }}&image={{ review.place_image }}&title={{ review.place_title }}&tel={{ review.place_tel }}" class="app">
+        이 관광지 상세 페이지로 이동
+      </a>
+      {% endif %}
       <a href="{{ url_for('review') }}">← 리뷰 목록으로 돌아가기</a>
     </div>
 
