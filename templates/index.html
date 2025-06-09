@@ -26,14 +26,6 @@
       </div>
     </div>
 
-    <div class="login-logout">
-      {% if user %}
-        <a href="{{ url_for('dashboard') }}" class="app">{{ user.username }}</a>
-        <a href="{{ url_for('logout') }}" class="app">로그아웃</a>
-      {% else %}
-        <a href="{{ url_for('login') }}" class="app">로그인</a>
-      {% endif %}
-    </div>
 
     <!-- 여행 이미지 추가 -->
     <div class="banner-image">
