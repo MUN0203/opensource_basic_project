@@ -499,7 +499,32 @@ def recommend_theme(theme_name):
     else:
         items = []
 
-    return render_template('theme_result.html', theme=theme_name, items=items)
+    # 날씨 정보 가져오기
+    locs = []
+    for it in items:
+        try:
+            lat = float(it.get('mapy', 0))
+            lon = float(it.get('mapx', 0))
+            locs.append((lat, lon))
+        except Exception:
+            locs.append((0, 0))
+    lats = [lat for lat, lon in locs]
+    lons = [lon for lat, lon in locs]
+    weather_list = get_kma_weather_multi(lats, lons)
+    
+    for idx, it in enumerate(items):
+        w = weather_list[idx] if idx < len(weather_list) else None
+        if isinstance(w, dict) and w.get("current"):
+            it['weather'] = w
+            it['weather_status'] = w["current"].get("weather_kr", "날씨 정보 없음")
+        else:
+            it['weather'] = None
+            it['weather_status'] = "날씨 정보 없음"
+
+    return render_template('theme_result.html',
+                           theme=theme_name,
+                           items=items,
+                           weatherItems=weather_list)
 
 # 리뷰 확인 페이지
 @app.route('/review')
