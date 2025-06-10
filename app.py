@@ -441,7 +441,7 @@ def search():
                 lon = float(item.get('mapx', 0))
                 locs.append((lat, lon))
             except Exception:
-                locs.append((0, 0))  
+                locs.append((0, 0))
 
         # 위도, 경도 분리
         lats = [lat for lat, lon in locs]
@@ -459,6 +459,9 @@ def search():
            else:
               item['weather'] = None
               item['weather_status'] = "날씨 정보 없음"
+
+        # 검색 결과에 대한 날씨 리스트를 results에 저장
+        results = weather_list
 
     return render_template(
         'search.html',
