@@ -62,22 +62,17 @@
                 </h3>
                 <p class="place-address">📍 {{ item.addr1 or '주소 정보 없음' }}</p>
                 <p class="place-phone">☎️ {{ item.tel or '전화번호 정보 없음' }}</p>
-                {# ----- 날씨 정보 출력 시작 ----- #}
-                {% set weather_data = weatherItems[loop.index0] if weatherItems and loop.index0 < weatherItems|length else None %}
-                
-                {% if weather_data %}
-                    {% if weather_data == "정보 없음" %}
-                        <p class="place-weather">🌦 날씨 정보 없음</p>
-                    {% elif weather_data.current and weather_data.current.temperature is defined and weather_data.current.weather_kr is defined %}
-                        <p class="place-weather">🌦 현재: {{ weather_data.current.temperature }}°C, {{ weather_data.current.weather_kr }}</p>
-                    {% else %}
-                        <p class="place-weather">🌦 날씨 정보를 가져올 수 없습니다.</p>
-                    {% endif %}
-                {% else %}
-                    {# weatherItems가 없거나 items보다 짧아서 해당 인덱스의 날씨 정보가 없는 경우 #}
-                    <p class="place-weather">🌦 날씨 정보 로드 실패</p>
-                {% endif %}
-                {# ----- 날씨 정보 출력 끝 ----- #}
+                <p class="place-weather">
+                 {{ item.weather_status | weather_emoji }}
+                 {% if item.weather_status %}
+                   현재 날씨: {{ item.weather_status }}
+                 {% else %}
+                   날씨 정보 없음
+                 {% endif %}
+                 {% if item.weather and item.weather.current and item.weather.current.temperature is not none %}
+                  ({{ item.weather.current.temperature }}℃)
+                 {% endif %}
+                </p>
                 <!-- 카카오맵 위치-->
                 <a class="map-button"
                    href="https://map.kakao.com/?q={{ item.title | urlencode }}"
