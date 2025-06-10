@@ -49,50 +49,60 @@
       <div id="map"></div>
 
       <!-- 날씨 정보 -->
-      <h2>현재 날씨</h2>
+      <h3>현재 날씨</h3>
       {% if weather and weather.current and not weather.current.error %}
-        <p>{{ weather.current.weather_kr | weather_emoji }} {{ weather.current.weather_kr }}</p>
-        <p>기온: {{ weather.current.temperature }}℃</p>
-        <p>관측 시각: {{ weather.current.time.strftime('%Y-%m-%d %H:%M') }}</p>
-      {% else %}
-        <p>날씨 정보 없음</p>
-      {% endif %}
-
-      <h2>일별 예보</h2>
-      {% if weather and weather.forecast and not weather.forecast[0].error %}
-        <ul>
-          {% for day in weather.forecast %}
-           <li>
-             {{ day.date.strftime('%m/%d') }}:
-             {{ day.weather_kr | weather_emoji }} {{ day.weather_kr }},
-             최고: {{ day.t_max }}℃ / 최저: {{ day.t_min }}℃
-           </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>예보 없음</p>
-      {% endif %}
-
-      <p>태그</p>
-      {% if keywords %}
-        <p>
-          <ul>
-            {% for tag in keywords[:3] %}
-              <li>#{{ tag }}</li>
-            {% endfor %}
-          </ul>
+        <p class="current-weather">
+          {{ weather.current.weather_kr | weather_emoji }} {{ weather.current.weather_kr }} | {{ weather.current.temperature }}℃
         </p>
+        <p class="section-timestamp">관측 시각: {{ weather.current.time.strftime('%Y-%m-%d %H:%M') }}</p>
+      {% else %}
+       <p>날씨 정보 없음</p>
       {% endif %}
 
-      <p>이 지역의 특산물 목록</p>
-      {% if items2 %}
-        <h3>특산물 정보</h3>
-        <ul>
-          {% for it in items2 %}
-            <li>{{ it.cntntsSj }}</li>
-          {% endfor %}
-        </ul>
+
+      <h3>일별 예보</h3>
+      {% if weather and weather.forecast and not weather.forecast[0].error %}
+        <table class="forecast-table">
+          <thead>
+            <tr>
+             <th>날짜</th>
+             <th>날씨</th>
+             <th>최고기온</th>
+             <th>최저기온</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for day in weather.forecast %}
+              <tr>
+               <td>{{ day.date.strftime('%m/%d') }}</td>
+               <td>{{ day.weather_kr | weather_emoji }} {{ day.weather_kr }}</td>
+               <td>{{ day.t_max }}℃</td>
+               <td>{{ day.t_min }}℃</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+       <p>예보 없음</p>
       {% endif %}
+
+
+      <h3>태그</h3>
+      {% if keywords %}
+       <div class="tag-container">
+         {% for tag in keywords[:3] %}
+          <span class="tag">#{{ tag }}</span>
+         {% endfor %}
+       </div>
+      {% endif %}
+
+
+      <h3>이 지역의 특산물 목록</h3>
+       <ul>
+         {% for it in items2 %}
+           <li>{{ it.cntntsSj }}</li>
+         {% endfor %}
+       </ul>
 
       <h3>리뷰</h3>
       {% if session.get('user_id') %}
