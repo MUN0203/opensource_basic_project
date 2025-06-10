@@ -46,7 +46,11 @@
       <p>{{ item.addr1 }}</p>
 
       <h3>지도</h3>
-      <div id="map"></div>
+      <a class="map-button"
+        href="https://map.kakao.com/?q={{ item.title | urlencode }}"
+        target="_blank">
+       🗺️ 카카오맵 위치 보기
+      </a>
 
       <!-- 날씨 정보 -->
       <h3>현재 날씨</h3>
