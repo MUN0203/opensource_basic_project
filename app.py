@@ -147,9 +147,15 @@ def submit_review():
     img_path = None
     if image and allowed_file(image.filename):
         filename = secure_filename(image.filename)
-        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        image.save(save_path)
+        
+        save_dir = app.config['UPLOAD_FOLDER']
+        os.makedirs(save_dir, exist_ok=True)  # 디렉토리가 없으면 생성
+
+        save_path = os.path.join(save_dir, filename)
+        image.save(save_path) 
+
         img_path = os.path.join('uploads', filename)
+        
 
     # 장소 정보 가져오기
     contentid = request.form.get('contentid')
