@@ -50,7 +50,7 @@ This project uses the following open-source libraries and APIs:
 | 농사로 API         | Public API     | Subject to 농사로 usage policy |
 | Open-Meteo API    | Public API     | Subject to Open-Meteo usage policy |
 | KR-WordRank       | LGPL License   | Keyword extraction for Korean |
-| konlpy            | GPL License    | Stemming for Korean |
+| konlpy            | GPL License    | Natural Language Processing for Korean |
 
 > 
 > Third-party API services (TourAPI, Kakao Map API, 농사로 API, Open-Meteo API) are used in compliance with their respective terms of service. Please refer to their official documentation for details.
