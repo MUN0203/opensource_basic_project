@@ -29,3 +29,29 @@ https://github.com/MUN0203/opensource_basic_project
 
 #### 3. 라이브러리 설치
     pip3 install -r requirements.txt
+
+#### 4. 라이센스
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This project uses the following open-source libraries and APIs:
+
+| Library/API      | License        | Notes |
+|-------------------|----------------|-------|
+| Flask             | BSD-3-Clause   | Web backend framework |
+| Jinja2            | BSD-3-Clause   | HTML template engine |
+| TinyDB            | MIT License    | NoSQL database |
+| Werkzeug          | BSD-3-Clause   | Flask internal dependency |
+| python-dotenv     | BSD-3-Clause   | Environment variable management |
+| Flask-Bcrypt      | MIT License    | Password hashing |
+| Python            | PSF License    | Programming language |
+| TourAPI           | Public API     | Subject to TourAPI usage policy |
+| Kakao Map API     | Public API     | Subject to Kakao usage policy |
+| 농사로 API         | Public API     | Subject to 농사로 usage policy |
+| Open-Meteo API    | Public API     | Subject to Open-Meteo usage policy |
+
+> 
+> Third-party API services (TourAPI, Kakao Map API, 농사로 API, Open-Meteo API) are used in compliance with their respective terms of service. Please refer to their official documentation for details.
+
+
