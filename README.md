@@ -3,13 +3,13 @@
 
 ## 구현 기능
 - 여행지 검색 (해당 지역의 설명, 이미지, 지도 링크, 날씨 정보를 제공)
-- 분위기 기반 여행지 추천 (사용자가 원하는 분위기를 선택시 랜덤으로 국내 여행지 추천)
-- 해당 지역의 특산품이나 관광정보를 제공
+- 분위기 기반 여행지 추천 (사용자가 원하는 분위기를 선택시 국내 여행지 추천)
+- 상세 페이지에서 특산품이나 관광정보를 제공
 
 ## 사용 기술 스택
 - 프론트엔드 작성 언어: HTML, CSS, JavaScript
 - 백엔드 작성 언어: Python
-- 웹 프레임워크: Flask (백엔드 ,BSD-3-Clause license), Bootstrap (프론트엔드, MIT License)
+- 웹 프레임워크: Flask (백엔드 ,BSD-3-Clause license)
 
 
 ## 개발 환경 설정 방법
@@ -30,10 +30,9 @@ https://github.com/MUN0203/opensource_basic_project
 #### 3. 라이브러리 설치
     pip3 install -r requirements.txt
 
-#### 4. 라이센스
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL License - see the [LICENSE](LICENSE) file for details.
 
 This project uses the following open-source libraries and APIs:
 
@@ -50,8 +49,8 @@ This project uses the following open-source libraries and APIs:
 | Kakao Map API     | Public API     | Subject to Kakao usage policy |
 | 농사로 API         | Public API     | Subject to 농사로 usage policy |
 | Open-Meteo API    | Public API     | Subject to Open-Meteo usage policy |
+| KR-WordRank       | LGPL License   | Keyword extraction for Korean |
+| konlpy            | GPL License    | Stemming for Korean |
 
 > 
 > Third-party API services (TourAPI, Kakao Map API, 농사로 API, Open-Meteo API) are used in compliance with their respective terms of service. Please refer to their official documentation for details.
-
-
