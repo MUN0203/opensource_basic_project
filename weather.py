@@ -19,7 +19,6 @@ WMO_KR = {
 def wmo2kr(code: int) -> str:
     return WMO_KR.get(code, "알 수 없음")
 
-# ── 버전 호환 유틸 ─────────────────────────────────
 def _attr(obj, *names):
     for n in names:
         if hasattr(obj, n):

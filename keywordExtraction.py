@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from krwordrank.word import KRWordRank
 from krwordrank.hangle import normalize
 from konlpy.tag import Okt
